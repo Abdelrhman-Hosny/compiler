@@ -39,7 +39,23 @@ associativity simply use %precedence
 %left  '*' '/'
 
 %%
-stmt: GEQ {printf("test");}
+stmt: ';' |
+    LOOP
+
+LOOP : WHILE '(' expr ')' stmt |
+    FOR '(' expr ';' expr ';' expr ')' stmt |
+    DO stmt WHILE '(' expr ')'
+
+expr : expr '+' term
+    | expr '-' term
+    | term
+
+term : term '*' factor
+    | term '/' factor
+    | factor
+
+factor: '(' expr ')'
+    | INTEGER
 %%
 
 main(int argc, char **argv)
