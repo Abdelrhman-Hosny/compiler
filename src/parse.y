@@ -38,23 +38,35 @@ associativity simply use %precedence
 %left '+' '-'
 %left  '*' '/'
 
+%precedence "then"
+%nonassoc ELSE
+
 %%
 stmt: ';' |
     expr |
     LOOP |
-    CONDITIONAL
+    CONDITIONAL 
 
-CONDITIONAL : SWITCH_CASE
+CONDITIONAL : SWITCH_CASE |
+                UIF
 
-SWITCH_CASE : SWITCH '(' expr ')' '{' STMT_LIST '}'
+MIF : IF '(' expr ')' '{' MIF '}' ELSE  '{' MIF '}' |
+        stmt
 
-STMT_LIST: CASE '(' ID ')' ':' stmt STMT_LIST |
+UIF : IF '(' expr ')'  stmt %prec "then" |
+        IF '(' expr ')' '{' MIF '}' ELSE UIF
+
+SWITCH_CASE : SWITCH '(' expr ')' '{' SWITCH_STMT_LIST '}'
+
+
+SWITCH_STMT_LIST: CASE '(' ID ')' ':' stmt SWITCH_STMT_LIST |
             CASE '(' ID ')' ':' stmt |
             DEFAULT ':' stmt 
 
-LOOP : WHILE '(' expr ')' stmt |
-    FOR '(' expr ';' expr ';' expr ')' stmt |
-    DO stmt WHILE '(' expr ')'
+
+LOOP : WHILE '(' expr ')' '{' stmt '}' |
+    FOR '(' expr ';' expr ';' expr ')' '{' stmt  '}'|
+    DO stmt WHILE '(' expr ')' ';'
 
 expr : expr '+' term
     | expr '-' term
