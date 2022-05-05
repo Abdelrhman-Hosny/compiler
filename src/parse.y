@@ -40,7 +40,17 @@ associativity simply use %precedence
 
 %%
 stmt: ';' |
-    LOOP
+    expr |
+    LOOP |
+    CONDITIONAL
+
+CONDITIONAL : SWITCH_CASE
+
+SWITCH_CASE : SWITCH '(' expr ')' '{' STMT_LIST '}'
+
+STMT_LIST: CASE '(' ID ')' ':' stmt STMT_LIST |
+            CASE '(' ID ')' ':' stmt |
+            DEFAULT ':' stmt 
 
 LOOP : WHILE '(' expr ')' stmt |
     FOR '(' expr ';' expr ';' expr ')' stmt |
