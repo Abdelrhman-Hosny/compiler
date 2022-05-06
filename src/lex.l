@@ -11,6 +11,7 @@ void yyerror(char *s);
 "else"            return ELSE;
 "switch"          return SWITCH;
 "case"            return CASE;
+"default"         return DEFAULT;
 "while"           return WHILE;
 "do"              return DO;
 "for"             return FOR;
