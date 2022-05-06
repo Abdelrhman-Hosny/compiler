@@ -7,4 +7,4 @@ parser:
 parser_counterexamples:
 	bison -d parse.y -Wcounterexamples
 compile:
-	gcc lex.yy.c y.tab.c -o a.out
+	gcc lex.yy.c parse.tab.c -o a.out
