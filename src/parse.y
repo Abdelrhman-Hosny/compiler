@@ -22,6 +22,7 @@ int yylex();
     AND "&&"
     OR "||"
 
+
 %token WHILE DO FOR BREAK CONTINUE 
 %token IF ELSE SWITCH CASE DEFAULT
 %token RETURN
@@ -40,7 +41,7 @@ associativity simply use %precedence
 %left '<' '>' "<=" ">=" "==" "!="
 %left '!'
 %left '+' '-'
-%left  '*' '/'
+%left  '*' '/' '%'
 
 %precedence "then"
 %nonassoc ELSE
@@ -58,90 +59,110 @@ declaration: function_declaration |
 
 
  /* Parameter lit for function definition ( parameter_list ) = ( int x, int y)*/
-function_declaration: function_return_type ID '(' parameter_list ')' block
+function_declaration: INT_DECLARATION ID '(' parameter_list ')' block |
+                        FLOAT_DECLARATION ID '(' parameter_list ')' block |
+                        CHAR_DECLARATION ID '(' parameter_list ')' block |
+                        VOID ID '(' parameter_list ')' block
 
 parameter_list: parameter |
                 parameter_list ',' parameter|
 
-parameter: data_type ID
+parameter: INT_DECLARATION ID | CHAR_DECLARATION ID | FLOAT_DECLARATION ID
 
 /* Function calls */
 
 function_call: ID '(' argument_list ')'
 
-argument_list: argument |
-                argument_list ',' argument |
-
-argument: ID |
-            expression
+argument_list: expression |
+                argument_list ',' expression |
 
 
 /* Variable declaration and assignment */
-variable_declaration: data_type ID ';'|
-                        data_type assignment
+variable_declaration: INT_DECLARATION ID ';'|
+                        FLOAT_DECLARATION ID ';'|
+                        CHAR_DECLARATION ID ';'|
+                        INT_DECLARATION assignment|
+                        FLOAT_DECLARATION assignment|
+                        CHAR_DECLARATION assignment
 
- /* TODO: replace expression with expression + function call */
 assignment: ID '=' expression ';'
 
 expression : math_expr |
-
+                boolean_expr
 
   /* mathematical expression */
-math_expr : math_expr '+' term
-    | math_expr '-' term
-    | term
+math_expr : INTEGER |
+            FLOAT |
+            ID |
+            CHARACTER |
+            function_call |
+            math_expr '+' math_expr |
+            math_expr '-' math_expr |
+            math_expr '*' math_expr |
+            math_expr '/' math_expr |
+            math_expr '%' math_expr 
 
-term : term '*' factor
-    | term '/' factor
-    | factor
-
-factor: '(' math_expr ')'|
-        INTEGER |
-        FLOAT |
-        ID
 
  /* logical expression */
 
-  /* Data types and return types*/
-data_type : INT_DECLARATION |
-            FLOAT_DECLARATION |
-            CHAR_DECLARATION
-
-function_return_type: data_type |
-                        VOID
-
-
-
-
+boolean_expr : expression '>' expression |
+                expression '<' expression |
+                expression ">=" expression |
+                expression "<=" expression |
+               expression "==" expression |
+                expression "!=" expression |
+                expression "||" expression |
+                expression "&&" expression |
+                '!' expression
 
 
+block : '{' stmt_list '}' |
+        '{' '}'
 
-stmt: ';' |
-    expr |
-    LOOP |
-    CONDITIONAL 
+stmt_list: stmt_list stmt |
+            stmt
 
-CONDITIONAL : SWITCH_CASE |
-                UIF |
-                MIF
+stmt : variable_declaration |
+        assignment |
+        expression |
+        loop |
+        conditional |
+        BREAK ';' |
+        CONTINUE ';' |
+        RETURN ';' |
+        RETURN expression ';'
 
-MIF : IF '(' expr ')' '{' MIF '}' ELSE  '{' MIF '}' |
-        stmt
+ /* Loops */
+optional_assignment : assignment |
+optional_expression : expression |
 
-UIF : IF '(' expr ')'  stmt %prec "then" |
-        IF '(' expr ')' '{' MIF '}' ELSE UIF
+loop: WHILE '(' expression ')' block |
+        FOR '(' optional_assignment ';' optional_expression ';' optional_assignment ')' block |
+        DO block WHILE '(' expression ')' ';'
 
-SWITCH_CASE : SWITCH '(' expr ')' '{' SWITCH_STMT_LIST '}'
+ /* Conditional statements */
+
+conditional: switch_case |
+                uif |
+                mif
+
+uif : IF '(' expression ')' block |
+        IF '(' expression ')' mif ELSE uif
+
+mif : IF '(' expression ')' mif ELSE mif |
+        block
+
+switch_case: SWITCH '(' ID ')' '{' case_list '}'
+
+case_list: case_list case_clause |
+            DEFAULT ':' stmt_list|
 
 
-SWITCH_STMT_LIST: CASE '(' ID ')' ':' stmt SWITCH_STMT_LIST |
-            CASE '(' ID ')' ':' stmt |
-            DEFAULT ':' stmt 
+case_clause: CASE '(' expression ')'':' stmt_list
 
 
-LOOP : WHILE '(' expr ')' '{' stmt '}' |
-    FOR '(' expr ';' expr ';' expr ')' '{' stmt  '}'|
-    DO stmt WHILE '(' expr ')' ';'
+
+
 %%
 
 main(int argc, char **argv)
