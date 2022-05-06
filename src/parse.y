@@ -11,6 +11,7 @@ int yylex();
     double doubleValue;
     char charValue;
     char* stringValue;
+    char* identifierName;
 }
 
 %start program
@@ -25,10 +26,13 @@ int yylex();
 
 %token WHILE DO FOR BREAK CONTINUE 
 %token IF ELSE SWITCH CASE DEFAULT
-%token RETURN
-%token ID INTEGER FLOAT CHARACTER
+%token RETURN VOID
 %token INT_DECLARATION FLOAT_DECLARATION CHAR_DECLARATION
-%token VOID
+
+%token <identifierName> ID
+%token <doubleValue> FLOAT
+%token <intValue> INTEGER
+%token <charValue> CHARACTER
 
 /*
 by declaring %left '+' before %left '*', this gives precedence to '*'
@@ -96,11 +100,11 @@ math_expr : INTEGER |
             ID |
             CHARACTER |
             function_call |
-            math_expr '+' math_expr |
-            math_expr '-' math_expr |
-            math_expr '*' math_expr |
-            math_expr '/' math_expr |
-            math_expr '%' math_expr 
+            math_expr '+' math_expr {$$ = $1 + $3}|
+            math_expr '-' math_expr {$$ = $1 - $3}|
+            math_expr '*' math_expr {$$ = $1 * $3}|
+            math_expr '/' math_expr {$$ = $1 / $3}|
+            math_expr '%' math_expr {$$ = $1 % $3}|
 
 
  /* logical expression */
