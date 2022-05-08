@@ -3,7 +3,7 @@ lexer:
 
 parser:
 	bison -d parse.y
-build: lexer parser
+build: parser lexer
 
 parser_counterexamples:
 	bison -d parse.y -Wcounterexamples
