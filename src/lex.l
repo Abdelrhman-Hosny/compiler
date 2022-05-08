@@ -8,6 +8,7 @@ void yyerror(char *);
 
 %%
 "if"              return IF;
+"const"           return CONST_DECLARATION;
 "else"            return ELSE;
 "switch"          return SWITCH;
 "case"            return CASE;
