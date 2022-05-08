@@ -29,7 +29,7 @@ extern int yylineno;
 %token WHILE DO FOR BREAK CONTINUE 
 %token IF ELSE SWITCH CASE DEFAULT
 %token RETURN VOID
-%token INT_DECLARATION FLOAT_DECLARATION CHAR_DECLARATION
+%token INT_DECLARATION FLOAT_DECLARATION CHAR_DECLARATION CONST_DECLARATION
 
 %token <identifierName> ID 
 %token <doubleValue> FLOAT
@@ -54,6 +54,7 @@ associativity simply use %precedence
 
 %precedence "then"
 %nonassoc ELSE
+%nonassoc UNARY_MINUS
 
 %%
 
@@ -80,19 +81,22 @@ parameter: INT_DECLARATION ID | CHAR_DECLARATION ID | FLOAT_DECLARATION ID
 
 /* Function calls */
 
-/* function_call: ID '(' argument_list ')'  */
+function_call: ID '(' argument_list ')' 
 
-/* argument_list: expression | */
-                /* argument_list ',' expression | */
-
+argument_list: expression |
+                argument_list ',' expression |
 
 /* Variable declaration and assignment */
 variable_declaration: INT_DECLARATION ID ';'|
                         FLOAT_DECLARATION ID ';'|
                         CHAR_DECLARATION ID ';'|
+                        CONST_DECLARATION INT_DECLARATION assignment ';'|
+                        CONST_DECLARATION FLOAT_DECLARATION assignment ';'|
+                        CONST_DECLARATION CHAR_DECLARATION assignment ';' |
                         INT_DECLARATION assignment ';'|
                         FLOAT_DECLARATION assignment ';'|
                         CHAR_DECLARATION assignment ';'
+
 
 assignment: ID '=' expression
 
@@ -104,13 +108,14 @@ math_expr : INTEGER {$$ = $1;} |
             FLOAT {$$ = $1;} |
             ID {;}|
             CHARACTER {$$ = $1;}|
-            /* function_call {printf("function call");}| */
+            function_call {;}|
             math_expr '+' math_expr { $$ = $1 + $3; } |
             math_expr '-' math_expr { $$ = $1 - $3; } |
             math_expr '*' math_expr { $$ = $1 * $3; } |
             math_expr '/' math_expr { $$ = $1 / $3; } |
             math_expr '%' math_expr {;} |
-            '(' math_expr ')'   { $$ = $2; }
+            '(' math_expr ')'   { $$ = $2; } |
+            '-' math_expr %prec UNARY_MINUS { $$ = -$2; }
 
 
  /* logical expression */
@@ -134,8 +139,8 @@ stmt_list: stmt_list stmt |
             stmt
 
 stmt : variable_declaration |
-        assignment |
-        expression |
+        assignment ';'|
+        expression ';' |
         loop |
         conditional |
         BREAK ';' |
