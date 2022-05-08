@@ -34,7 +34,7 @@ void yyerror(char *);
 "!="              return NEQ;
 "&&"              return AND;
 "||"              return OR;
-[-+*/%=<>!;{}()] {return yytext[0];}
+[-+*/%=<>!;{}():] {return yytext[0];}
 .   {yyerror("unknown character"); printf("%s\n", yytext);}
 %%
 
