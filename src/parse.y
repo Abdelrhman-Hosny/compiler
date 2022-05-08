@@ -52,10 +52,10 @@ associativity simply use %precedence
 %left  '*' '/' '%'
 
 
-%precedence "then"
+%nonassoc IFX
 %nonassoc ELSE
-%nonassoc UNARY_MINUS
 
+%nonassoc UNARY_MINUS
 %%
 
 program: declaration_list 
@@ -147,6 +147,7 @@ stmt : variable_declaration |
         CONTINUE ';' |
         RETURN ';' |
         RETURN expression ';' |
+        block |
         ';'
 
  /* Loops */
@@ -162,14 +163,11 @@ loop: WHILE '(' optional_expression ')' block |
  /* Conditional statements */
 
 conditional: switch_case |
-                uif |
-                mif
+            if_statement
 
-uif : IF '(' expression ')' block |
-        IF '(' expression ')' mif ELSE uif
+if_statement: IF  '(' expression  ')' stmt end_if 
 
-mif : IF '(' expression ')' mif ELSE mif |
-        block
+end_if: %prec IFX | ELSE  stmt 
 
 switch_case: SWITCH '(' ID ')' '{' case_list '}'
 
