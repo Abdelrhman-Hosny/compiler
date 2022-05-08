@@ -29,11 +29,13 @@ int yylex();
 %token RETURN VOID
 %token INT_DECLARATION FLOAT_DECLARATION CHAR_DECLARATION
 
-%token <identifierName> ID
+%token <identifierName> ID 
 %token <doubleValue> FLOAT
 %token <intValue> INTEGER
 %token <charValue> CHARACTER
 
+%type <identifierName> assignment
+%type <doubleValue> math_expr boolean_expr expression
 /*
 by declaring %left '+' before %left '*', this gives precedence to '*'
 the lower you declare something, the higher precedence it has
@@ -94,30 +96,30 @@ assignment: ID '=' expression ';'
 expression : math_expr |
                 boolean_expr
 
-  /* mathematical expression */
-math_expr : INTEGER |
-            FLOAT |
-            ID |
-            CHARACTER |
-            function_call |
-            math_expr '+' math_expr {$$ = $1 + $3}|
-            math_expr '-' math_expr {$$ = $1 - $3}|
-            math_expr '*' math_expr {$$ = $1 * $3}|
-            math_expr '/' math_expr {$$ = $1 / $3}|
-            math_expr '%' math_expr {$$ = $1 % $3}|
+  /* mathematical expression //TODO: fix % */
+math_expr : INTEGER {$$ = $1;} |
+            FLOAT {$$ = $1;} |
+            ID {;}|
+            CHARACTER {$$ = $1;}|
+            function_call {printf("function call");}|
+            math_expr '+' math_expr { $$ = $1 + $3; } |
+            math_expr '-' math_expr { $$ = $1 - $3; } |
+            math_expr '*' math_expr { $$ = $1 * $3; } |
+            math_expr '/' math_expr { $$ = $1 / $3; } |
+            math_expr '%' math_expr { $$ = $1 - $3; } 
 
 
  /* logical expression */
 
-boolean_expr : expression '>' expression |
-                expression '<' expression |
-                expression ">=" expression |
-                expression "<=" expression |
-               expression "==" expression |
-                expression "!=" expression |
-                expression "||" expression |
-                expression "&&" expression |
-                '!' expression
+boolean_expr : expression '>' expression {$$ = $1 > $3;}|
+                expression '<' expression {$$ = $1 < $3;}|
+                expression ">=" expression {$$ = $1 >= $3;}|
+                expression "<=" expression {$$ = $1 <= $3;}|
+               expression "==" expression {$$ = $1 == $3;}|
+                expression "!=" expression {$$ = $1 != $3;}|
+                expression "||" expression {$$ = $1 || $3;}|
+                expression "&&" expression {$$ = $1 && $3;}|
+                '!' expression { $$ = !$2; }
 
 
 block : '{' stmt_list '}' |
@@ -169,9 +171,9 @@ case_clause: CASE '(' expression ')'':' stmt_list
 
 %%
 
-main(int argc, char **argv)
+main()
 {
-    yyparse();
+    return yyparse();
 }
 
 yyerror(char *s)
