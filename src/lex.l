@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 int yylineno;
-void yyerror(char *s);
+void yyerror(char *);
 %}
 
 %%
@@ -28,7 +28,12 @@ void yyerror(char *s);
 [0-9]+\.[0-9]+ { yylval.doubleValue = atof(yytext); return FLOAT;}
 [ \t]+ ; // ignore whitespace
 \n    {yylineno++;}
-[<>=!]= {return yytext; printf("found %s\n", yytext);}
+">="              return GEQ;
+"<="             return LEQ;
+"=="              return EQ;
+"!="              return NEQ;
+"&&"              return AND;
+"||"              return OR;
 [-+*/%=<>!;{}()] {return yytext[0];}
 .   {yyerror("unknown character"); printf("%s\n", yytext);}
 %%
