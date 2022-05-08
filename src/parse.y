@@ -89,11 +89,11 @@ argument_list: expression |
 variable_declaration: INT_DECLARATION ID ';'|
                         FLOAT_DECLARATION ID ';'|
                         CHAR_DECLARATION ID ';'|
-                        INT_DECLARATION assignment|
-                        FLOAT_DECLARATION assignment|
-                        CHAR_DECLARATION assignment
+                        INT_DECLARATION assignment ';'|
+                        FLOAT_DECLARATION assignment ';'|
+                        CHAR_DECLARATION assignment ';'
 
-assignment: ID '=' expression ';'
+assignment: ID '=' expression
 
 expression : math_expr |
                 boolean_expr
@@ -142,11 +142,13 @@ stmt : variable_declaration |
         ';'
 
  /* Loops */
-optional_assignment : assignment |
 optional_expression : expression |
 
+for_assignment: INT_DECLARATION assignment |
+                assignment |
+
 loop: WHILE '(' optional_expression ')' block |
-        FOR '(' optional_assignment ';' optional_expression ';' optional_assignment ')' block |
+        FOR '(' for_assignment ';' optional_expression ';' for_assignment ')' block |
         DO block WHILE '(' optional_expression ')' ';'
 
  /* Conditional statements */
