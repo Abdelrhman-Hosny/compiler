@@ -51,6 +51,7 @@ associativity simply use %precedence
 %left '+' '-'
 %left  '*' '/' '%'
 
+
 %precedence "then"
 %nonassoc ELSE
 
@@ -79,10 +80,10 @@ parameter: INT_DECLARATION ID | CHAR_DECLARATION ID | FLOAT_DECLARATION ID
 
 /* Function calls */
 
-function_call: ID '(' argument_list ')'
+/* function_call: ID '(' argument_list ')'  */
 
-argument_list: expression |
-                argument_list ',' expression |
+/* argument_list: expression | */
+                /* argument_list ',' expression | */
 
 
 /* Variable declaration and assignment */
@@ -103,12 +104,13 @@ math_expr : INTEGER {$$ = $1;} |
             FLOAT {$$ = $1;} |
             ID {;}|
             CHARACTER {$$ = $1;}|
-            function_call {printf("function call");}|
+            /* function_call {printf("function call");}| */
             math_expr '+' math_expr { $$ = $1 + $3; } |
             math_expr '-' math_expr { $$ = $1 - $3; } |
             math_expr '*' math_expr { $$ = $1 * $3; } |
             math_expr '/' math_expr { $$ = $1 / $3; } |
-            math_expr '%' math_expr { $$ = $1 - $3; } 
+            math_expr '%' math_expr {;} |
+            '(' math_expr ')'   { $$ = $2; }
 
 
  /* logical expression */
@@ -121,7 +123,8 @@ boolean_expr : expression '>' expression {$$ = $1 > $3;}|
                 expression "!=" expression {$$ = $1 != $3;}|
                 expression "||" expression {$$ = $1 || $3;}|
                 expression "&&" expression {$$ = $1 && $3;}|
-                '!' expression { $$ = !$2; }
+                '!' expression { $$ = !$2; } |
+                '(' boolean_expr ')'   { $$ = $2; }
 
 
 block : '{' stmt_list '}' |
@@ -165,11 +168,11 @@ mif : IF '(' expression ')' mif ELSE mif |
 
 switch_case: SWITCH '(' ID ')' '{' case_list '}'
 
-case_list: case_list case_clause |
+case_list:  case_clause case_list|
             DEFAULT ':' stmt_list|
 
 
-case_clause: CASE '(' expression ')'':' stmt_list
+case_clause: CASE  expression ':' stmt_list
 
 
 
