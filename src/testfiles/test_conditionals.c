@@ -25,7 +25,11 @@ int main()
     else
     {
     }
-    
+
+    if (x == 5)
+    {
+    }
+ 
     switch (x)
     {
     case 2:
