@@ -1,8 +1,10 @@
 %{
-void yerror(char *s);
-int yylex();
-
 #include <stdio.h>
+#include <stdlib.h>
+void yyerror(char *s);
+int yylex();
+extern FILE *yyin;
+extern int yylineno;
 %}
 
 // Start of Yacc definitions
@@ -136,15 +138,16 @@ stmt : variable_declaration |
         BREAK ';' |
         CONTINUE ';' |
         RETURN ';' |
-        RETURN expression ';'
+        RETURN expression ';' |
+        ';'
 
  /* Loops */
 optional_assignment : assignment |
 optional_expression : expression |
 
-loop: WHILE '(' expression ')' block |
+loop: WHILE '(' optional_expression ')' block |
         FOR '(' optional_assignment ';' optional_expression ';' optional_assignment ')' block |
-        DO block WHILE '(' expression ')' ';'
+        DO block WHILE '(' optional_expression ')' ';'
 
  /* Conditional statements */
 
@@ -171,12 +174,27 @@ case_clause: CASE '(' expression ')'':' stmt_list
 
 %%
 
-main()
+void yyerror(char *s)
 {
-    return yyparse();
+    fprintf(stdout, "%s in line number: %d\n", s, yylineno);
 }
 
-yyerror(char *s)
+int main(int argc, char* argv[])
 {
-    fprintf(stderr, "%s\n", s);
+    FILE * myFile;
+    if (argc == 1) myFile = fopen("test.txt", "r");
+    else myFile = fopen(argv[1], "r");
+
+    if (!myFile)
+    {
+        printf("File not found\n");
+        return -1;
+    }
+
+    yyin = myFile;
+
+    do {
+        yyparse();
+    } while (!feof(yyin));
 }
+
