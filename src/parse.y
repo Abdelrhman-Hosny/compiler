@@ -1,10 +1,13 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include "constants.h"
 void yyerror(char *s);
 int yylex();
 extern FILE *yyin;
 extern int yylineno;
+// when we exit current scope, we return to the parent
+int currentScope = 0, scopeCount = 0;
 %}
 
 // Start of Yacc definitions
@@ -67,9 +70,8 @@ declaration_list: declaration_list declaration |
 declaration: function_declaration |
                 variable_declaration
 
-
  /* Parameter lit for function definition ( parameter_list ) = ( int x, int y)*/
-function_declaration: INT_DECLARATION ID '(' parameter_list ')' block |
+function_declaration: INT_DECLARATION ID '(' parameter_list ')'  block  |
                         FLOAT_DECLARATION ID '(' parameter_list ')' block |
                         CHAR_DECLARATION ID '(' parameter_list ')' block |
                         VOID ID '(' parameter_list ')' block
@@ -77,7 +79,9 @@ function_declaration: INT_DECLARATION ID '(' parameter_list ')' block |
 parameter_list: parameter |
                 parameter_list ',' parameter|
 
-parameter: INT_DECLARATION ID | CHAR_DECLARATION ID | FLOAT_DECLARATION ID
+parameter: INT_DECLARATION ID  |
+            CHAR_DECLARATION ID |
+            FLOAT_DECLARATION ID
 
 /* Function calls */
 
@@ -87,18 +91,18 @@ argument_list: expression |
                 argument_list ',' expression |
 
 /* Variable declaration and assignment */
-variable_declaration: INT_DECLARATION ID ';'|
-                        FLOAT_DECLARATION ID ';'|
-                        CHAR_DECLARATION ID ';'|
-                        CONST_DECLARATION INT_DECLARATION assignment ';'|
-                        CONST_DECLARATION FLOAT_DECLARATION assignment ';'|
-                        CONST_DECLARATION CHAR_DECLARATION assignment ';' |
-                        INT_DECLARATION assignment ';'|
-                        FLOAT_DECLARATION assignment ';'|
-                        CHAR_DECLARATION assignment ';'
+variable_declaration: INT_DECLARATION ID ';' {create_int($2, currentScope);}|
+                        FLOAT_DECLARATION ID ';'{create_float($2, currentScope);}|
+                        CHAR_DECLARATION ID ';'{create_char($2, currentScope);}|
+                        CONST_DECLARATION INT_DECLARATION {create_int($2, currentScope, IS_CONSTANT);} assignment ';'|
+                        CONST_DECLARATION FLOAT_DECLARATION {create_float($2, currentScope, IS_CONSTANT);} assignment ';'|
+                        CONST_DECLARATION CHAR_DECLARATION {create_char($2, currentScope, IS_CONSTANT);} assignment ';' |
+                        INT_DECLARATION {create_int($2, currentScope);} assignment ';'|
+                        FLOAT_DECLARATION {create_float($2, currentScope);} assignment ';'|
+                        CHAR_DECLARATION {create_char($2, currentScope);} assignment ';'
 
 
-assignment: ID '=' expression
+assignment: ID '=' expression { assign_variable($1, $3);}
 
 expression : math_expr |
                 boolean_expr
@@ -190,7 +194,7 @@ void yyerror(char *s)
 int main(int argc, char* argv[])
 {
     FILE * myFile;
-    if (argc == 1) myFile = fopen("test.txt", "r");
+    if (argc == 1) myFile = fopen("test.c", "r");
     else myFile = fopen(argv[1], "r");
 
     if (!myFile)
