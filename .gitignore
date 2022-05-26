@@ -1,1 +1,4 @@
 *.exe
+parse.tab.c
+parse.tab.h
+lex.yy.c
