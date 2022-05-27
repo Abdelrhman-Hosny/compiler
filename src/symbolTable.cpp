@@ -93,3 +93,17 @@ void printSymbolTable()
         }
    }
 }
+
+
+void createNewScope(int currentScope , int scopeCount)
+{
+    int parentScope = currentScope;
+    scopeCount++;
+    currentScope = scopeCount;
+    scopeTable[currentScope].parentScope = parentScope;
+}
+
+int getParentScope(int currentScope)
+{
+    return scopeTable[currentScope].parentScope;
+}
