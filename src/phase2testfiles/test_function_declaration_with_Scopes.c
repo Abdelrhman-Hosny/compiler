@@ -1,6 +1,6 @@
 int func(int xy , int Po , int z)
 {
-    return x + P + z;
+    return xy + Po + z;
 }
 
 void func(int xy, int p , int x)

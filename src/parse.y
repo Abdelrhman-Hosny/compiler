@@ -77,18 +77,17 @@ declaration: function_declaration |
                 variable_declaration
 
  /* Parameter lit for function definition ( parameter_list ) = ( int x, int y)*/
-function_declaration:   INT_DECLARATION ID {  printf("ID: %s\n",$2);} '(' parameter_list ')'  
-                        {createFunction($2,$2,INT_TYPE); } block  |
-                        FLOAT_DECLARATION ID '(' parameter_list ')' block |
-                        CHAR_DECLARATION ID '(' parameter_list ')' block |
-                        VOID ID '(' parameter_list ')' block
+function_declaration:   INT_DECLARATION ID {createNewFunction(scopeCount,$2,INT_TYPE);} '(' parameter_list ')' {if(!checkFunctionExists(scopeCount,INT_TYPE)) exit(-1);} block  |
+                        FLOAT_DECLARATION ID {createNewFunction(scopeCount,$2,FLOAT_TYPE);} '(' parameter_list ')' {if(!checkFunctionExists(scopeCount,FLOAT_TYPE)) exit(-1);} block |
+                        CHAR_DECLARATION ID {createNewFunction(scopeCount,$2,CHAR_TYPE);} '(' parameter_list ')' {if(!checkFunctionExists(scopeCount,CHAR_TYPE)) exit(-1);} block |
+                        VOID ID {createNewFunction(scopeCount,$2,VOID_TYPE);} '(' parameter_list ')' {if(!checkFunctionExists(scopeCount,VOID_TYPE)) exit(-1);} block
 
 parameter_list: parameter|
                 parameter_list ',' parameter|
 
-parameter: INT_DECLARATION ID  {printf("parameter: %s\n",$2)}|
-            CHAR_DECLARATION ID |
-            FLOAT_DECLARATION ID
+parameter: INT_DECLARATION ID  {addParameter($2,INT_TYPE,scopeCount);}|
+            CHAR_DECLARATION ID {addParameter($2,CHAR_TYPE,scopeCount);}|
+            FLOAT_DECLARATION ID{addParameter($2,FLOAT_TYPE,scopeCount);}
 
 /* Function calls */
 
