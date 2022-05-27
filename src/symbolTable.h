@@ -15,6 +15,8 @@ extern "C" {
     // void print_table();
     // char get_value_c(char* name, int& flag);
     // char* get_value_s(char* name, int& flag);
+    void createNewScope(int currentScope,int scopeCount);
+    int getParentScope(int currentScope);
 #ifdef __cplusplus
     }
 #endif

@@ -1,0 +1,7 @@
+make.exe --dry-run --keep-going --print-directory
+make: Entering directory 'd:/University/College Files/CCE Senior I/Spring 2022/Compilers/Project/compiler'
+ 
+make: *** No targets specified and no makefile found.  Stop.
+
+make: Leaving directory 'd:/University/College Files/CCE Senior I/Spring 2022/Compilers/Project/compiler'
+ 

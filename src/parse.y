@@ -303,8 +303,8 @@ boolean_expr : expression '>' expression
                 }
 
 
-block : '{' stmt_list '}' |
-        '{' '}'
+block : '{' {createNewScope(currentScope,scopeCount); currentScope = ++scopeCount;} stmt_list '}' {currentScope = getParentScope(currentScope);} |
+        '{' {createNewScope(currentScope,scopeCount); currentScope = ++scopeCount;} '}' {currentScope = getParentScope(currentScope);}
 
 stmt_list: stmt_list stmt |
             stmt
@@ -340,7 +340,7 @@ if_statement: IF  '(' expression  ')' stmt end_if
 
 end_if: %prec IFX | ELSE  stmt 
 
-switch_case: SWITCH '(' ID ')' '{' case_list '}'
+switch_case: SWITCH '(' ID ')' '{'{createNewScope(currentScope,scopeCount);currentScope = ++scopeCount;} case_list '}' {currentScope = getParentScope(currentScope);}
 
 case_list:  case_clause case_list|
             DEFAULT ':' stmt_list|
@@ -352,7 +352,6 @@ case_clause: CASE  expression ':' stmt_list
 
 
 %%
-
 void yyerror(char *s)
 {
     fprintf(stdout, "%s in line number: %d\n", s, yylineno);
