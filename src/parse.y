@@ -5,6 +5,7 @@
 #include "constants.h"
 #include "symbolTable.h"
 #include "dataStructures.h"
+#include <string.h>
 void yyerror(char *s);
 int yylex();
 extern FILE *yyin;
@@ -44,7 +45,8 @@ int currentScope = 0, scopeCount = 0;
 %token <charValue> CHARACTER
 
 %type <identifierName> assignment
-%type <expressionData> math_expr boolean_expr expression
+%type <expressionData> math_expr boolean_expr expression function_call
+%type <stringValue> parameter_list parameter
 /*
 by declaring %left '+' before %left '*', this gives precedence to '*'
 the lower you declare something, the higher precedence it has
@@ -75,72 +77,75 @@ declaration: function_declaration |
                 variable_declaration
 
  /* Parameter lit for function definition ( parameter_list ) = ( int x, int y)*/
-function_declaration: INT_DECLARATION ID '(' parameter_list ')'  block  |
-                        FLOAT_DECLARATION ID '(' parameter_list ')' block |
-                        CHAR_DECLARATION ID '(' parameter_list ')' block |
-                        VOID ID '(' parameter_list ')' block
+function_declaration:   INT_DECLARATION ID {createNewFunction(scopeCount,$2,INT_TYPE);} '(' parameter_list ')' {if(!checkFunctionExists(scopeCount,INT_TYPE)) exit(-1);} block  |
+                        FLOAT_DECLARATION ID {createNewFunction(scopeCount,$2,FLOAT_TYPE);} '(' parameter_list ')' {if(!checkFunctionExists(scopeCount,FLOAT_TYPE)) exit(-1);} block |
+                        CHAR_DECLARATION ID {createNewFunction(scopeCount,$2,CHAR_TYPE);} '(' parameter_list ')' {if(!checkFunctionExists(scopeCount,CHAR_TYPE)) exit(-1);} block |
+                        VOID ID {createNewFunction(scopeCount,$2,VOID_TYPE);} '(' parameter_list ')' {if(!checkFunctionExists(scopeCount,VOID_TYPE)) exit(-1);} block
 
-parameter_list: parameter |
+parameter_list: parameter|
                 parameter_list ',' parameter|
 
-parameter: INT_DECLARATION ID  |
-            CHAR_DECLARATION ID |
-            FLOAT_DECLARATION ID
+parameter: INT_DECLARATION ID  {if(!addParameter($2,INT_TYPE,scopeCount)) exit(-1);}|
+            CHAR_DECLARATION ID {if(!addParameter($2,CHAR_TYPE,scopeCount))  exit(-1);}|
+            FLOAT_DECLARATION ID{if(!addParameter($2,FLOAT_TYPE,scopeCount))  exit(-1);}
 
+//TODO: add Function calls
 /* Function calls */
+/* type expressionData type isValid = 0*/
+function_call: ID '(' argument_list ')' {printf("ID function call: %s\n",$1);}
 
-function_call: ID '(' argument_list ')' 
-
-argument_list: expression |
-                argument_list ',' expression |
+//we will make counter and check on type of each argrument
+argument_list: expression {printf("type: %f\n",$1->type);}|
+                argument_list ',' expression  {printf("type: %f\n",$3->type);}|
 
 /* Variable declaration and assignment */
 variable_declaration: INT_DECLARATION ID ';'
                         {
-                            createVariable($2, currentScope, INT_TYPE, !IS_CONSTANT);
+                            createVariable($2, currentScope, INT_TYPE, !IS_CONSTANT,0);
                         }
                         |
                         FLOAT_DECLARATION ID ';'
                         {
-                            createVariable($2, currentScope, FLOAT_TYPE, !IS_CONSTANT);
+                            createVariable($2, currentScope, FLOAT_TYPE, !IS_CONSTANT,0);
                         }
                         |
                         CHAR_DECLARATION ID ';'
                         {
-                            createVariable($2, currentScope, CHAR_TYPE, !IS_CONSTANT);
+                            createVariable($2, currentScope, CHAR_TYPE, !IS_CONSTANT,0);
                         }
                         |
                         CONST_DECLARATION INT_DECLARATION  ID '=' expression ';'
                         {
-                            createVariable($3, currentScope, INT_TYPE, IS_CONSTANT);
+                            createVariable($3, currentScope, INT_TYPE, IS_CONSTANT,0);
                         }
                         |
                         CONST_DECLARATION FLOAT_DECLARATION  ID '=' expression ';'
                         {
-                            createVariable($3, currentScope, FLOAT_TYPE, IS_CONSTANT);
+                            createVariable($3, currentScope, FLOAT_TYPE, IS_CONSTANT,0);
                         }
                         |
                         CONST_DECLARATION CHAR_DECLARATION  ID '=' expression ';'
                         {
-                            createVariable($3, currentScope, CHAR_TYPE, IS_CONSTANT);
+                            createVariable($3, currentScope, CHAR_TYPE, IS_CONSTANT,0);
                         }
                         |
                         INT_DECLARATION  ID '=' expression ';'
                         {
-                            createVariable($2, currentScope, INT_TYPE, !IS_CONSTANT);
+                            createVariable($2, currentScope, INT_TYPE, !IS_CONSTANT,0);
                         }
                         |
                         FLOAT_DECLARATION  ID '=' expression ';'
                         {
-                            createVariable($2, currentScope, FLOAT_TYPE, !IS_CONSTANT);
+                            createVariable($2, currentScope, FLOAT_TYPE, !IS_CONSTANT,0);
                         }
                         |
                         CHAR_DECLARATION  ID '=' expression ';'
                         {
-                            createVariable($2, currentScope, CHAR_TYPE, !IS_CONSTANT);
+                            createVariable($2, currentScope, CHAR_TYPE, !IS_CONSTANT,0);
                         }
 
 
+//TODO: check if variable exists in the parent scope
 assignment: ID '=' expression 
 
 expression : math_expr |
@@ -315,7 +320,7 @@ stmt : variable_declaration |
         conditional |
         BREAK ';' |
         CONTINUE ';' |
-        RETURN ';' |
+        RETURN ';' | //TODO: check if return is in the correct place
         RETURN expression ';' |
         block |
         ';'

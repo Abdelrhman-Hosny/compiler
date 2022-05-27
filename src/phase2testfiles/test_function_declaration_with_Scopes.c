@@ -3,13 +3,13 @@ int func(int xy , int Po , int z)
     return xy + Po + z;
 }
 
-void func(int xy, int p ,float e)
+void func(int xy, int p , int x)
 {
-    //return x + p;
+    return x + p;
 }
 
 
-int main(){
+int main(int y){
     int x;
     int y = 3;
     int p;
@@ -18,6 +18,5 @@ int main(){
         int z = 3;
     }
     int z = 4;
-    char z = 4;
-    func(x , y, z);
+
 }
