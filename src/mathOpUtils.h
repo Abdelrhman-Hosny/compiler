@@ -29,22 +29,22 @@ int binaryMathExpression(struct ExpressionData * returnOp,
         switch (operation)
         {
         case ADD_OP:
-            returnOp->doubleValue = getNumValue(leftOp, lType) + getNumValue(rightOp, rType);
+            returnOp->doubleValue = getNumValue(leftOp) + getNumValue(rightOp);
             break;
 
         case SUB_OP:
-            returnOp->doubleValue = getNumValue(leftOp, lType) - getNumValue(rightOp, rType);
+            returnOp->doubleValue = getNumValue(leftOp) - getNumValue(rightOp);
             break;
         case MUL_OP:
-            returnOp->doubleValue = getNumValue(leftOp, lType) * getNumValue(rightOp, rType);
+            returnOp->doubleValue = getNumValue(leftOp) * getNumValue(rightOp);
             break;
         case DIV_OP:
-            if (getNumValue(rightOp, rType) == 0)
+            if (getNumValue(rightOp) == 0)
             {
                 std::cout << "Error: Division by zero" << std::endl;
                 return -1;
             }
-            returnOp->doubleValue = getNumValue(leftOp, lType) / getNumValue(rightOp, rType);
+            returnOp->doubleValue = getNumValue(leftOp) / getNumValue(rightOp);
             break; 
         case MOD_OP:
             std::cout << "Two operators of mod operator - % - must be of type integer" << std::endl;
@@ -87,6 +87,8 @@ int binaryMathExpression(struct ExpressionData * returnOp,
             returnOp->intValue = leftOp->intValue % rightOp->intValue;
             break; 
         default:
+            std::cout << "Error: Invalid operation" << std::endl;
+            return -1;
             break;
         }
                                                      
