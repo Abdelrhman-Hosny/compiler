@@ -149,14 +149,14 @@ expression : math_expr |
   /* mathematical expression //TODO: fix % */
 math_expr : INTEGER 
             {
-                $$ = (struct ExpressionData*) malloc(sizeof(struct ExpressionData));
+                $$ = createExpressionMacro;
                 $$->type = INT_TYPE;
                 $$->intValue = $1;
             }
             |
             FLOAT 
             {
-                $$ = (struct ExpressionData*) malloc(sizeof(struct ExpressionData));
+                $$ = createExpressionMacro;
                 $$->type = FLOAT_TYPE;
                 $$->doubleValue = $1;
             }
@@ -177,7 +177,7 @@ math_expr : INTEGER
             |
             CHARACTER 
             {
-                $$ = (struct ExpressionData*) malloc(sizeof(struct ExpressionData));
+                $$ = createExpressionMacro;
                 $$->type = CHAR_TYPE;
                 $$->charValue = $1;          
             }
@@ -189,27 +189,40 @@ math_expr : INTEGER
             |
             math_expr '+' math_expr 
             {
-               binaryMathExpression($$, $1, $3, ADD_OP);
+               $$ = binaryMathExpression($$, $1, $3, ADD_OP);
+               if (! $$) exit(-1);
             }
             |
             math_expr '-' math_expr 
             {
-               binaryMathExpression($$, $1, $3, SUB_OP);
+               $$ = binaryMathExpression($$, $1, $3, SUB_OP);
+
+               if (! $$) exit(-1);
             }
             |
             math_expr '*' math_expr 
-            {
-               binaryMathExpression($$, $1, $3, MUL_OP);
+            { 
+               $$ = binaryMathExpression($$, $1, $3, MUL_OP);
+
+               if (! $$) exit(-1);
+
             }
             |
             math_expr '/' math_expr 
             {
-               binaryMathExpression($$, $1, $3, DIV_OP);
+               $$ = binaryMathExpression($$, $1, $3, DIV_OP);
+
+                if (! $$) exit(-1);
+
             }
             |
             math_expr '%' math_expr 
             {
-               binaryMathExpression($$, $1, $3, MOD_OP);
+                
+               $$ = binaryMathExpression($$, $1, $3, MOD_OP);
+
+                if (! $$) exit(-1);
+
             }
             |
             '(' math_expr ')'   
@@ -229,6 +242,7 @@ math_expr : INTEGER
                     exit(1);
                 }
                 $$ = $2;
+
             }
 
 
