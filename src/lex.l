@@ -2,7 +2,7 @@
 #include "parse.tab.h"
 #include <stdio.h>
 
-int yylineno;
+// int yylineno;
 void yyerror(char *);
 %}
 
@@ -23,10 +23,10 @@ void yyerror(char *);
 "int"            return INT_DECLARATION;
 "float"           return FLOAT_DECLARATION;
 "void"              return VOID;
-['][a-zA-Z][']     {yylval.charValue = yytext[1]; return CHARACTER;}
-[a-zA-Z_][a-zA-Z0-9_]* { yylval.identifierName = yytext; return ID;}
+['][a-zA-Z][']     {strncpy(&yylval.charValue, &yytext[1], 1); return CHARACTER;}
+[a-zA-Z_][a-zA-Z0-9_]* { yylval.identifierName = strdup(yytext); return ID;}
 [0-9]+ { yylval.intValue = atoi(yytext); return INTEGER;}
-[0-9]+\.[0-9]+ { yylval.doubleValue = atof(yytext); return FLOAT;}
+[0-9]+\.[0-9]+ { yylval.doubleValue = strtof(yytext, NULL); return FLOAT;}
 [ \t]+ ; // ignore whitespace
 \n    {yylineno++;}
 ">="              return GEQ;
@@ -36,7 +36,7 @@ void yyerror(char *);
 "&&"              return AND;
 "||"              return OR;
 [-+*/%=<>!;{}():,] {return yytext[0];}
-.   {yyerror("unknown character"); printf("%s\n", yytext);}
+.   {yyerror("unknown character"); printf("%s\n", strdup(yytext));}
 %%
 
 int yywrap() {
