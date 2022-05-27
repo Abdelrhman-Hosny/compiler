@@ -1,4 +1,5 @@
 %{
+#include "mathOpUtils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "constants.h"
@@ -152,17 +153,26 @@ math_expr : INTEGER
                 $$->type = INT_TYPE;
                 $$->intValue = $1;
             }
-             |
+            |
             FLOAT 
             {
                 $$ = (struct ExpressionData*) malloc(sizeof(struct ExpressionData));
                 $$->type = FLOAT_TYPE;
                 $$->doubleValue = $1;
             }
-             |
+            |
             ID 
             {
-                ;
+                // TODO
+                // get variable value from sybmol table and handle the error
+
+                // create a new expression data
+                // $$ = createExpressionMacro
+                // $$->type = variableType;
+                
+                // based on the type assign the value in the correct position
+    
+
             }
             |
             CHARACTER 
@@ -179,47 +189,101 @@ math_expr : INTEGER
             |
             math_expr '+' math_expr 
             {
+               binaryMathExpression($$, $1, $3, ADD_OP);
             }
-             |
+            |
             math_expr '-' math_expr 
             {
+               binaryMathExpression($$, $1, $3, SUB_OP);
             }
-             |
+            |
             math_expr '*' math_expr 
             {
+               binaryMathExpression($$, $1, $3, MUL_OP);
             }
-             |
+            |
             math_expr '/' math_expr 
             {
+               binaryMathExpression($$, $1, $3, DIV_OP);
             }
-             |
+            |
             math_expr '%' math_expr 
             {
-                ;
+               binaryMathExpression($$, $1, $3, MOD_OP);
             }
-             |
+            |
             '(' math_expr ')'   
             {
+                $$ = $2;
             }
-             |
+            |
             '-' math_expr %prec UNARY_MINUS 
             {
-            
+                if ($2->type == INT_TYPE)
+                    $2->intValue = -$2->intValue;
+                else if ($2->type == FLOAT_TYPE)
+                    $2->doubleValue = -$2->doubleValue;
+                else
+                {
+                    printf("Error: Unary minus can only be applied to int or float\n");
+                    exit(1);
+                }
+                $$ = $2;
             }
 
 
  /* logical expression */
 
-boolean_expr : expression '>' expression {}|
-                expression '<' expression {}|
-                expression ">=" expression {}|
-                expression "<=" expression {}|
-               expression "==" expression {}|
-                expression "!=" expression {}|
-                expression "||" expression {}|
-                expression "&&" expression {}|
-                '!' expression {} |
-                '(' boolean_expr ')'   {}
+boolean_expr : expression '>' expression 
+                {
+                    
+                }
+                |
+                expression '<' expression 
+                {
+                    
+                }
+                |
+                expression ">=" expression 
+                {
+                    
+                }
+                |
+                expression "<=" expression 
+                {
+                    
+                }
+                |
+               expression "==" expression 
+                {
+                    
+                }
+                |
+                expression "!=" expression 
+                {
+                    
+                }
+                |
+                expression "||" expression 
+                {
+                    
+                }
+                |
+                expression "&&" expression 
+                {
+                    
+                }
+                |
+                '!' expression 
+                {
+                    
+                } 
+                |
+                '(' boolean_expr ')'   
+                {
+                    
+                
+                }
 
 
 block : '{' stmt_list '}' |
