@@ -155,6 +155,7 @@ math_expr : INTEGER
                 $$ = createExpressionMacro;
                 $$->type = INT_TYPE;
                 $$->intValue = $1;
+                $$->valueIsValid = 1;
             }
             |
             FLOAT 
@@ -162,6 +163,7 @@ math_expr : INTEGER
                 $$ = createExpressionMacro;
                 $$->type = FLOAT_TYPE;
                 $$->doubleValue = $1;
+                $$->valueIsValid = 1;
             }
             |
             ID 
@@ -183,6 +185,7 @@ math_expr : INTEGER
                 $$ = createExpressionMacro;
                 $$->type = CHAR_TYPE;
                 $$->charValue = $1;          
+                $$->valueIsValid = 1;
             }
             |
             function_call 
