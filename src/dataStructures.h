@@ -1,14 +1,18 @@
 #pragma once
+
 #include "constants.h"
+#include <stdio.h>
 struct ExpressionData
 {
     int type;
     int intValue;
     double doubleValue;
     char charValue;
+    int valueIsValid = 0;
 };
 
-inline double getNumValue(struct ExpressionData* data)
+double getNumValue(struct ExpressionData* data)
 {
-    return (data->type == INT_TYPE)? (double) data->intValue : data->doubleValue;
+    double value = (data->type == INT_TYPE) ? data->intValue : data->doubleValue;
+    return value;
 }
