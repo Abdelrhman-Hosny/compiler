@@ -4,9 +4,10 @@
 
 #include "dataStructures.h"
 #include "constants.h"
-#include <iostream>
+#include <stdio.h>
+#include <cstdlib>
 
-int binaryMathExpression(struct ExpressionData * returnOp,
+struct ExpressionData * binaryMathExpression(struct ExpressionData * returnOp,
                      struct ExpressionData * leftOp,
                     struct ExpressionData * rightOp,
                     int operation)
@@ -14,10 +15,11 @@ int binaryMathExpression(struct ExpressionData * returnOp,
     int lType = leftOp->type;
     int rType = rightOp->type;
 
+
     if ( lType == CHAR_TYPE || rType == CHAR_TYPE)
     {
-        std::cout << "Error: Cannot perform arithmetic operation on char" << std::endl;
-        return -1;
+        printf("Error: Cannot perform arithmetic operation on char");
+        return NULL;
     }
 
     returnOp = createExpressionMacro;
@@ -41,17 +43,17 @@ int binaryMathExpression(struct ExpressionData * returnOp,
         case DIV_OP:
             if (getNumValue(rightOp) == 0)
             {
-                std::cout << "Error: Division by zero" << std::endl;
-                return -1;
+                printf("Error: Division by zero\n");
+                return NULL;
             }
             returnOp->doubleValue = getNumValue(leftOp) / getNumValue(rightOp);
             break; 
         case MOD_OP:
-            std::cout << "Two operators of mod operator - % - must be of type integer" << std::endl;
+            printf("Two operators of mod operator - % - must be of type integer");
             break;
         default:
-            std::cout << "Error: Invalid operation" << std::endl;
-            return -1;
+            printf("Error: Invalid operation");
+            return NULL;
             break;
         }
     }
@@ -73,22 +75,22 @@ int binaryMathExpression(struct ExpressionData * returnOp,
         case DIV_OP:
             if (rightOp->intValue == 0)
             {
-                std::cout << "Error: Division by zero" << std::endl;
-                return -1;
+                printf("Error: Division by zero");
+                return NULL;
             }
             returnOp->intValue = leftOp->intValue / rightOp->intValue;
             break;
         case MOD_OP:
             if (rightOp->intValue == 0)
             {
-                std::cout << "Error: Division by zero" << std::endl;
-                return -1;
+                printf("Error: Division by zero");
+                return NULL;
             }
             returnOp->intValue = leftOp->intValue % rightOp->intValue;
             break; 
         default:
-            std::cout << "Error: Invalid operation" << std::endl;
-            return -1;
+            printf("Error: Invalid operation");
+            return NULL;
             break;
         }
                                                      
@@ -97,6 +99,6 @@ int binaryMathExpression(struct ExpressionData * returnOp,
     free(leftOp);
     free(rightOp);
 
-    return 1;
+    return returnOp;
 }
 
