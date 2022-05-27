@@ -240,16 +240,8 @@ math_expr : INTEGER
             |
             '-' math_expr %prec UNARY_MINUS 
             {
-                if ($2->type == INT_TYPE)
-                    $2->intValue = -$2->intValue;
-                else if ($2->type == FLOAT_TYPE)
-                    $2->doubleValue = -$2->doubleValue;
-                else
-                {
-                    printf("Error: Unary minus can only be applied to int or float\n");
-                    exit(1);
-                }
-                $$ = $2;
+                $$ = unaryMinusMathExpression($2);
+                if (!$$) exit(-1);
             }
 
 
@@ -257,42 +249,50 @@ math_expr : INTEGER
 
 boolean_expr : expression '>' expression 
                 {
-                    
+                   $$ = binaryLogicalExpression($$, $1, $3, GT_OP);  
+                   if (! $$) exit(-1);
                 }
                 |
                 expression '<' expression 
                 {
-                    
+                   $$ = binaryLogicalExpression($$, $1, $3, LT_OP);
+                   if (! $$) exit(-1); 
                 }
                 |
                 expression ">=" expression 
                 {
-                    
+                   $$ = binaryLogicalExpression($$, $1, $3, GEQ_OP);
+                   if (! $$) exit(-1);                    
                 }
                 |
                 expression "<=" expression 
                 {
-                    
+                   $$ = binaryLogicalExpression($$, $1, $3, LT_OP);
+                   if (! $$) exit(-1);                    
                 }
                 |
                expression "==" expression 
                 {
-                    
+                   $$ = binaryLogicalExpression($$, $1, $3, EQ_OP);
+                   if (! $$) exit(-1);                   
                 }
                 |
                 expression "!=" expression 
                 {
-                    
+                   $$ = binaryLogicalExpression($$, $1, $3, NEQ_OP);
+                   if (! $$) exit(-1);                  
                 }
                 |
                 expression "||" expression 
                 {
-                    
+                    $$ = binaryLogicalExpression($$, $1, $3, OR_OP);
+                    if (! $$) exit(-1);                 
                 }
                 |
                 expression "&&" expression 
                 {
-                    
+                    $$ = binaryLogicalExpression($$, $1, $3, AND_OP);
+                    if (! $$) exit(-1);                
                 }
                 |
                 '!' expression 
@@ -303,7 +303,7 @@ boolean_expr : expression '>' expression
                 '(' boolean_expr ')'   
                 {
                     
-                
+                    $$ = $2;
                 }
 
 
