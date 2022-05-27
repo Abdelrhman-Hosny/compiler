@@ -8,7 +8,7 @@ struct ExpressionData
     char charValue;
 };
 
-inline double getNumValue(struct ExpressionData* data, int type)
+inline double getNumValue(struct ExpressionData* data)
 {
-    return (type == INT_TYPE)? (double) data->intValue : data->doubleValue;
+    return (data->type == INT_TYPE)? (double) data->intValue : data->doubleValue;
 }
