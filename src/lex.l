@@ -36,6 +36,7 @@ void yyerror(char *);
 "&&"              return AND;
 "||"              return OR;
 [-+*/%=<>!;{}():,] {return yytext[0];}
+[/][/].*\n {printf("comments\n");}
 .   {yyerror("unknown character"); printf("%s\n", strdup(yytext));}
 %%
 
