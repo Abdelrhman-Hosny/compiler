@@ -45,7 +45,7 @@ int currentScope = 0, scopeCount = 0;
 %token <charValue> CHARACTER
 
 %type <identifierName> assignment
-%type <expressionData> math_expr boolean_expr expression
+%type <expressionData> math_expr boolean_expr expression function_call
 %type <stringValue> parameter_list parameter
 /*
 by declaring %left '+' before %left '*', this gives precedence to '*'
@@ -85,61 +85,61 @@ function_declaration:   INT_DECLARATION ID {createNewFunction(scopeCount,$2,INT_
 parameter_list: parameter|
                 parameter_list ',' parameter|
 
-parameter: INT_DECLARATION ID  {addParameter($2,INT_TYPE,scopeCount);}|
-            CHAR_DECLARATION ID {addParameter($2,CHAR_TYPE,scopeCount);}|
-            FLOAT_DECLARATION ID{addParameter($2,FLOAT_TYPE,scopeCount);}
+parameter: INT_DECLARATION ID  {if(!addParameter($2,INT_TYPE,scopeCount)) exit(-1);}|
+            CHAR_DECLARATION ID {if(!addParameter($2,CHAR_TYPE,scopeCount))  exit(-1);}|
+            FLOAT_DECLARATION ID{if(!addParameter($2,FLOAT_TYPE,scopeCount))  exit(-1);}
 
 /* Function calls */
+/* type expressionData type isValid = 0*/
+function_call: ID '(' argument_list ')' {printf("ID: %s",$1);}
 
-function_call: ID '(' argument_list ')' 
-
-argument_list: expression |
+argument_list: expression {printf("type: %d\n",$1->type);}|
                 argument_list ',' expression |
 
 /* Variable declaration and assignment */
 variable_declaration: INT_DECLARATION ID ';'
                         {
-                            createVariable($2, currentScope, INT_TYPE, !IS_CONSTANT);
+                            createVariable($2, currentScope, INT_TYPE, !IS_CONSTANT,0);
                         }
                         |
                         FLOAT_DECLARATION ID ';'
                         {
-                            createVariable($2, currentScope, FLOAT_TYPE, !IS_CONSTANT);
+                            createVariable($2, currentScope, FLOAT_TYPE, !IS_CONSTANT,0);
                         }
                         |
                         CHAR_DECLARATION ID ';'
                         {
-                            createVariable($2, currentScope, CHAR_TYPE, !IS_CONSTANT);
+                            createVariable($2, currentScope, CHAR_TYPE, !IS_CONSTANT,0);
                         }
                         |
                         CONST_DECLARATION INT_DECLARATION  ID '=' expression ';'
                         {
-                            createVariable($3, currentScope, INT_TYPE, IS_CONSTANT);
+                            createVariable($3, currentScope, INT_TYPE, IS_CONSTANT,0);
                         }
                         |
                         CONST_DECLARATION FLOAT_DECLARATION  ID '=' expression ';'
                         {
-                            createVariable($3, currentScope, FLOAT_TYPE, IS_CONSTANT);
+                            createVariable($3, currentScope, FLOAT_TYPE, IS_CONSTANT,0);
                         }
                         |
                         CONST_DECLARATION CHAR_DECLARATION  ID '=' expression ';'
                         {
-                            createVariable($3, currentScope, CHAR_TYPE, IS_CONSTANT);
+                            createVariable($3, currentScope, CHAR_TYPE, IS_CONSTANT,0);
                         }
                         |
                         INT_DECLARATION  ID '=' expression ';'
                         {
-                            createVariable($2, currentScope, INT_TYPE, !IS_CONSTANT);
+                            createVariable($2, currentScope, INT_TYPE, !IS_CONSTANT,0);
                         }
                         |
                         FLOAT_DECLARATION  ID '=' expression ';'
                         {
-                            createVariable($2, currentScope, FLOAT_TYPE, !IS_CONSTANT);
+                            createVariable($2, currentScope, FLOAT_TYPE, !IS_CONSTANT,0);
                         }
                         |
                         CHAR_DECLARATION  ID '=' expression ';'
                         {
-                            createVariable($2, currentScope, CHAR_TYPE, !IS_CONSTANT);
+                            createVariable($2, currentScope, CHAR_TYPE, !IS_CONSTANT,0);
                         }
 
 

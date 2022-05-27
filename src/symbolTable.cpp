@@ -50,7 +50,7 @@ std::unordered_map<std::string, functionStruct> functionTable;
 
 
 
-int createVariable(char *name, int scope, int type ,int isConstant)
+int createVariable(char *name, int scope, int type ,int isConstant , int isAssigned)
 {
     std::string variableName(name);
 
@@ -64,7 +64,7 @@ int createVariable(char *name, int scope, int type ,int isConstant)
     }
 
     // varData : type, isAssigned, isConstant
-    variableData varData = {type, 0, isConstant};
+    variableData varData = {type, isAssigned, isConstant};
     scopeTable[scope].variables[variableName] =  varData;
     
     return 1;
@@ -113,42 +113,39 @@ void createNewFunction(int currentScope,char* name , int returnType)
     functionTable[functionName].returnTypesMap[newScope] = returnType;
 }
 
-void addParameter(char* name, int type, int scope)
+int addParameter(char* name, int type, int scope)
 {
     std::string parameterName(name);
     scope++;
     std::string functionName = scopeTable[scope].functionName;
     std::cout << "Adding parameter " << parameterName << " in scope " << functionName << std::endl;
     functionTable[functionName].parametersListMap[scope].parameterTypeMap[parameterName] = type;
+    int isDuplicated = createVariable(name, scope, type, 0, 1);
+    if(isDuplicated == -1)
+    {
+        return 0;
+    }
+    return isDuplicated;
 }
+
 
 int checkFunctionExists(int functionScope , int returnType)
 {
     //as we will know that the function is in the next currentScope
     functionScope++;
     std::string functionName = scopeTable[functionScope].functionName;
-    std::vector <int> similarReturnTypesScopes;
     if(functionTable[functionName].returnTypesMap.size() == 1)
         return 1;
-    //if the function has multiple return types we will check if the return type is similar to ones that written Before
-    for (auto it = functionTable[functionName].returnTypesMap.begin(); it != functionTable[functionName].returnTypesMap.end(); ++it)
-    {
-        if(it->second == returnType && it->first != functionScope)
-            similarReturnTypesScopes.push_back(it->first);
-    }
-    //if there is no similar return type we will return 1 which means that the function is not defined
-    if(similarReturnTypesScopes.size() == 0)
-        return 1;
-    //if there is a similar return type we will check if the parameters are similar
-    for (auto it = similarReturnTypesScopes.begin(); it != similarReturnTypesScopes.end(); ++it)
+    //loop over all functions that have the same number and compare the parameters
+    for (auto it = functionTable[functionName].parametersListMap.begin(); it != functionTable[functionName].parametersListMap.end(); ++it)
     {
         //first we will check if the parameters have the same size
-        if(functionTable[functionName].parametersListMap[*it].parameterTypeMap.size() == functionTable[functionName].parametersListMap[functionScope].parameterTypeMap.size())
+        if(it->first != functionScope && it->second.parameterTypeMap.size() == functionTable[functionName].parametersListMap[functionScope].parameterTypeMap.size())
         {
             //if the parameters have the same size we will check if the parameters are similar
             bool isSimilar = true;
             auto startOfCurrentFunctionParameterMap = functionTable[functionName].parametersListMap[functionScope].parameterTypeMap.begin();
-            for (auto it2 = functionTable[functionName].parametersListMap[*it].parameterTypeMap.begin(); it2 != functionTable[functionName].parametersListMap[*it].parameterTypeMap.end(); ++it2)
+            for (auto it2 = it->second.parameterTypeMap.begin(); it2 != it->second.parameterTypeMap.end(); ++it2)
             {
                 //that means there exists a parameter that is not similar so we will break
                  if(it2->second != startOfCurrentFunctionParameterMap->second)
@@ -166,7 +163,6 @@ int checkFunctionExists(int functionScope , int returnType)
             }
         }
     }
-
     return 1;
     
 }
