@@ -15,6 +15,7 @@ extern "C" {
     // char* get_value_s(char* name, int& flag);
     void createNewScope(int currentScope,int scopeCount);
     int getParentScope(int currentScope);
+    int createFunction(char * name, char* parameters,int returnType);
 #ifdef __cplusplus
     }
 #endif

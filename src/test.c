@@ -1,5 +1,10 @@
+int func(int xy , int Po , int z)
+{
+    return x + P + z;
+}
 
-int main(){
+
+int main(int y){
     int x;
     int y = 3;
     int p;

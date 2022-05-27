@@ -4,6 +4,7 @@
 #include "constants.h"
 #include "symbolTable.h"
 #include "dataStructures.h"
+#include <string.h>
 void yyerror(char *s);
 int yylex();
 extern FILE *yyin;
@@ -44,6 +45,7 @@ int currentScope = 0, scopeCount = 0;
 
 %type <identifierName> assignment
 %type <expressionData> math_expr boolean_expr expression
+%type <stringValue> parameter_list parameter
 /*
 by declaring %left '+' before %left '*', this gives precedence to '*'
 the lower you declare something, the higher precedence it has
@@ -74,15 +76,16 @@ declaration: function_declaration |
                 variable_declaration
 
  /* Parameter lit for function definition ( parameter_list ) = ( int x, int y)*/
-function_declaration: INT_DECLARATION ID '(' parameter_list ')'  block  |
+function_declaration:   INT_DECLARATION ID {  printf("ID: %s\n",$2);} '(' parameter_list ')'  
+                        {createFunction($2,$2,INT_TYPE); } block  |
                         FLOAT_DECLARATION ID '(' parameter_list ')' block |
                         CHAR_DECLARATION ID '(' parameter_list ')' block |
                         VOID ID '(' parameter_list ')' block
 
-parameter_list: parameter |
+parameter_list: parameter|
                 parameter_list ',' parameter|
 
-parameter: INT_DECLARATION ID  |
+parameter: INT_DECLARATION ID  {printf("parameter: %s\n",$2)}|
             CHAR_DECLARATION ID |
             FLOAT_DECLARATION ID
 

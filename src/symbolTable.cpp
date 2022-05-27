@@ -107,3 +107,21 @@ int getParentScope(int currentScope)
 {
     return scopeTable[currentScope].parentScope;
 }
+
+
+int createFunction(char * name, char* parameters,int returnType)
+{
+    std::string functionName(name);
+
+    std::cout << "Creating function " << functionName << std::endl;
+
+    // Check if function already exists in this scope
+    if (functionTable.find(functionName) != functionTable.end())
+    {
+        std::cout << "Function " << functionName << " already exists in scope " << std::endl;
+        return -1;
+    }
+    std::string parametersName(parameters);
+    std::cout << "Parameters: " << parametersName << std::endl;
+    return 1;
+}
