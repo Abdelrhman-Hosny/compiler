@@ -1,4 +1,4 @@
-TESTFILES="./src/testfiles/*"
+TESTFILES="./src/phase1files/*"
 
 echo "Running tests..."
 echo "Make sure you are in the project root directory"
