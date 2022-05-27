@@ -89,12 +89,14 @@ parameter: INT_DECLARATION ID  {if(!addParameter($2,INT_TYPE,scopeCount)) exit(-
             CHAR_DECLARATION ID {if(!addParameter($2,CHAR_TYPE,scopeCount))  exit(-1);}|
             FLOAT_DECLARATION ID{if(!addParameter($2,FLOAT_TYPE,scopeCount))  exit(-1);}
 
+//TODO: add Function calls
 /* Function calls */
 /* type expressionData type isValid = 0*/
-function_call: ID '(' argument_list ')' {printf("ID: %s",$1);}
+function_call: ID '(' argument_list ')' {printf("ID function call: %s\n",$1);}
 
-argument_list: expression {printf("type: %d\n",$1->type);}|
-                argument_list ',' expression |
+//we will make counter and check on type of each argrument
+argument_list: expression {printf("type: %f\n",$1->type);}|
+                argument_list ',' expression  {printf("type: %f\n",$3->type);}|
 
 /* Variable declaration and assignment */
 variable_declaration: INT_DECLARATION ID ';'
@@ -143,6 +145,7 @@ variable_declaration: INT_DECLARATION ID ';'
                         }
 
 
+//TODO: check if variable exists in the parent scope
 assignment: ID '=' expression 
 
 expression : math_expr |
@@ -318,7 +321,7 @@ stmt : variable_declaration |
         conditional |
         BREAK ';' |
         CONTINUE ';' |
-        RETURN ';' |
+        RETURN ';' | //TODO: check if return is in the correct place
         RETURN expression ';' |
         block |
         ';'
