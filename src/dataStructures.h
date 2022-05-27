@@ -2,6 +2,7 @@
 struct ExpressionData
 {
     int type;
-    double numValue;
+    int intValue;
+    double doubleValue;
     char charValue;
 };

@@ -146,32 +146,80 @@ expression : math_expr |
                 boolean_expr
 
   /* mathematical expression //TODO: fix % */
-math_expr : INTEGER {$$ = $1;} |
-            FLOAT {$$ = $1;} |
-            ID {;}|
-            CHARACTER {$$ = $1;}|
-            function_call {;}|
-            math_expr '+' math_expr { $$ = $1 + $3; } |
-            math_expr '-' math_expr { $$ = $1 - $3; } |
-            math_expr '*' math_expr { $$ = $1 * $3; } |
-            math_expr '/' math_expr { $$ = $1 / $3; } |
-            math_expr '%' math_expr {;} |
-            '(' math_expr ')'   { $$ = $2; } |
-            '-' math_expr %prec UNARY_MINUS { $$ = -$2; }
+math_expr : INTEGER 
+            {
+                $$ = (struct ExpressionData*) malloc(sizeof(struct ExpressionData));
+                $$->type = INT_TYPE;
+                $$->intValue = $1;
+            }
+             |
+            FLOAT 
+            {
+                $$ = (struct ExpressionData*) malloc(sizeof(struct ExpressionData));
+                $$->type = FLOAT_TYPE;
+                $$->doubleValue = $1;
+            }
+             |
+            ID 
+            {
+                ;
+            }
+            |
+            CHARACTER 
+            {
+                $$ = (struct ExpressionData*) malloc(sizeof(struct ExpressionData));
+                $$->type = CHAR_TYPE;
+                $$->charValue = $1;          
+            }
+            |
+            function_call 
+            {
+                ;
+            }
+            |
+            math_expr '+' math_expr 
+            {
+            }
+             |
+            math_expr '-' math_expr 
+            {
+            }
+             |
+            math_expr '*' math_expr 
+            {
+            }
+             |
+            math_expr '/' math_expr 
+            {
+            }
+             |
+            math_expr '%' math_expr 
+            {
+                ;
+            }
+             |
+            '(' math_expr ')'   
+            {
+            }
+             |
+            '-' math_expr %prec UNARY_MINUS 
+            {
+            
+            }
 
 
  /* logical expression */
 
-boolean_expr : expression '>' expression {$$ = $1 > $3;}|
-                expression '<' expression {$$ = $1 < $3;}|
-                expression ">=" expression {$$ = $1 >= $3;}|
-                expression "<=" expression {$$ = $1 <= $3;}|
-               expression "==" expression {$$ = $1 == $3;}|
-                expression "!=" expression {$$ = $1 != $3;}|
-                expression "||" expression {$$ = $1 || $3;}|
-                expression "&&" expression {$$ = $1 && $3;}|
-                '!' expression { $$ = !$2; } |
-                '(' boolean_expr ')'   { $$ = $2; }
+boolean_expr : expression '>' expression {}|
+                expression '<' expression {}|
+                expression ">=" expression {}|
+                expression "<=" expression {}|
+               expression "==" expression {}|
+                expression "!=" expression {}|
+                expression "||" expression {}|
+                expression "&&" expression {}|
+                '!' expression {} |
+                '(' boolean_expr ')'   {}
 
 
 block : '{' stmt_list '}' |
