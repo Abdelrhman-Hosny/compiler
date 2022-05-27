@@ -18,7 +18,7 @@ struct ExpressionData * binaryMathExpression(struct ExpressionData * returnOp,
 
     if ( lType == CHAR_TYPE || rType == CHAR_TYPE)
     {
-        printf("Error: Cannot perform arithmetic operation on char");
+        printf("Error: Cannot perform arithmetic operation on char\n");
         return NULL;
     }
 
@@ -49,10 +49,10 @@ struct ExpressionData * binaryMathExpression(struct ExpressionData * returnOp,
             returnOp->doubleValue = getNumValue(leftOp) / getNumValue(rightOp);
             break; 
         case MOD_OP:
-            printf("Two operators of mod operator - % - must be of type integer");
+            printf("Two operators of mod operator - % - must be of type integer\n");
             break;
         default:
-            printf("Error: Invalid operation");
+            printf("Error: Invalid operation\n");
             return NULL;
             break;
         }
@@ -75,7 +75,7 @@ struct ExpressionData * binaryMathExpression(struct ExpressionData * returnOp,
         case DIV_OP:
             if (rightOp->intValue == 0)
             {
-                printf("Error: Division by zero");
+                printf("Error: Division by zero\n");
                 return NULL;
             }
             returnOp->intValue = leftOp->intValue / rightOp->intValue;
@@ -83,13 +83,13 @@ struct ExpressionData * binaryMathExpression(struct ExpressionData * returnOp,
         case MOD_OP:
             if (rightOp->intValue == 0)
             {
-                printf("Error: Division by zero");
+                printf("Error: Division by zero\n");
                 return NULL;
             }
             returnOp->intValue = leftOp->intValue % rightOp->intValue;
             break; 
         default:
-            printf("Error: Invalid operation");
+            printf("Error: Invalid operation\n");
             return NULL;
             break;
         }
