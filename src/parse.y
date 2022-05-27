@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "constants.h"
+#include "symbolTable.h"
+#include "dataStructures.h"
 void yyerror(char *s);
 int yylex();
 extern FILE *yyin;
@@ -17,6 +19,7 @@ int currentScope = 0, scopeCount = 0;
     char charValue;
     char* stringValue;
     char* identifierName;
+    struct ExpressionData* expressionData;
 }
 
 %start program
@@ -40,7 +43,7 @@ int currentScope = 0, scopeCount = 0;
 %token <charValue> CHARACTER
 
 %type <identifierName> assignment
-%type <doubleValue> math_expr boolean_expr expression
+%type <expressionData> math_expr boolean_expr expression
 /*
 by declaring %left '+' before %left '*', this gives precedence to '*'
 the lower you declare something, the higher precedence it has
@@ -91,18 +94,53 @@ argument_list: expression |
                 argument_list ',' expression |
 
 /* Variable declaration and assignment */
-variable_declaration: INT_DECLARATION ID ';' {create_int($2, currentScope);}|
-                        FLOAT_DECLARATION ID ';'{create_float($2, currentScope);}|
-                        CHAR_DECLARATION ID ';'{create_char($2, currentScope);}|
-                        CONST_DECLARATION INT_DECLARATION {create_int($2, currentScope, IS_CONSTANT);} assignment ';'|
-                        CONST_DECLARATION FLOAT_DECLARATION {create_float($2, currentScope, IS_CONSTANT);} assignment ';'|
-                        CONST_DECLARATION CHAR_DECLARATION {create_char($2, currentScope, IS_CONSTANT);} assignment ';' |
-                        INT_DECLARATION {create_int($2, currentScope);} assignment ';'|
-                        FLOAT_DECLARATION {create_float($2, currentScope);} assignment ';'|
-                        CHAR_DECLARATION {create_char($2, currentScope);} assignment ';'
+variable_declaration: INT_DECLARATION ID ';'
+                        {
+                            createVariable($2, currentScope, INT_TYPE, !IS_CONSTANT);
+                        }
+                        |
+                        FLOAT_DECLARATION ID ';'
+                        {
+                            createVariable($2, currentScope, FLOAT_TYPE, !IS_CONSTANT);
+                        }
+                        |
+                        CHAR_DECLARATION ID ';'
+                        {
+                            createVariable($2, currentScope, CHAR_TYPE, !IS_CONSTANT);
+                        }
+                        |
+                        CONST_DECLARATION INT_DECLARATION  ID '=' expression ';'
+                        {
+                            createVariable($3, currentScope, INT_TYPE, IS_CONSTANT);
+                        }
+                        |
+                        CONST_DECLARATION FLOAT_DECLARATION  ID '=' expression ';'
+                        {
+                            createVariable($3, currentScope, FLOAT_TYPE, IS_CONSTANT);
+                        }
+                        |
+                        CONST_DECLARATION CHAR_DECLARATION  ID '=' expression ';'
+                        {
+                            createVariable($3, currentScope, CHAR_TYPE, IS_CONSTANT);
+                        }
+                        |
+                        INT_DECLARATION  ID '=' expression ';'
+                        {
+                            createVariable($2, currentScope, INT_TYPE, !IS_CONSTANT);
+                        }
+                        |
+                        FLOAT_DECLARATION  ID '=' expression ';'
+                        {
+                            createVariable($2, currentScope, FLOAT_TYPE, !IS_CONSTANT);
+                        }
+                        |
+                        CHAR_DECLARATION  ID '=' expression ';'
+                        {
+                            createVariable($2, currentScope, CHAR_TYPE, !IS_CONSTANT);
+                        }
 
 
-assignment: ID '=' expression { assign_variable($1, $3);}
+assignment: ID '=' expression 
 
 expression : math_expr |
                 boolean_expr
@@ -208,5 +246,7 @@ int main(int argc, char* argv[])
     do {
         yyparse();
     } while (!feof(yyin));
+
+    printSymbolTable();
 }
 
