@@ -4,3 +4,4 @@ parse.tab.h
 lex.yy.c
 .vscode/
 *.zip
+a.out
