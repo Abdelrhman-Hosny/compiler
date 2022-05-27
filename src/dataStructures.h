@@ -1,4 +1,4 @@
-
+#pragma once
 struct ExpressionData
 {
     int type;
