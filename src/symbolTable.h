@@ -1,5 +1,6 @@
 #pragma once
-#include "mathOpUtils.h"
+#include "dataStructures.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
