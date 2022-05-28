@@ -28,7 +28,7 @@ struct parameterListStruct {
     // x( int y )
     // will cause us to store y : INT_TYPE in the map
     // key is variable name, value is type
-    std::map<std::string, int> parameterTypeMap;
+    std::vector <int> parameterTypeList;
 };
 
 
@@ -91,9 +91,9 @@ void printSymbolTable()
         {
             std::cout << "Return Type: " << it3->second << std::endl;
             std::cout << "Parameters: ";
-            for (auto it3 = it2->second.parameterTypeMap.begin(); it3 != it2->second.parameterTypeMap.end(); ++it3)
+            for (auto it3 = it2->second.parameterTypeList.begin(); it3 != it2->second.parameterTypeList.end(); ++it3)
             {
-                std::cout << it3->first << " : " << it3->second << " ";
+                std::cout << *it3<< " ";
             }
             std::cout << std::endl;
 
@@ -119,7 +119,7 @@ int addParameter(char* name, int type, int scope)
     scope++;
     std::string functionName = scopeTable[scope].functionName;
     std::cout << "Adding parameter " << parameterName << " in scope " << functionName << std::endl;
-    functionTable[functionName].parametersListMap[scope].parameterTypeMap[parameterName] = type;
+    functionTable[functionName].parametersListMap[scope].parameterTypeList.push_back(type);
     int isDuplicated = createVariable(name, scope, type, 0, 1);
     if(isDuplicated == -1)
     {
@@ -140,15 +140,15 @@ int checkFunctionExists(int functionScope , int returnType)
     for (auto it = functionTable[functionName].parametersListMap.begin(); it != functionTable[functionName].parametersListMap.end(); ++it)
     {
         //first we will check if the parameters have the same size
-        if(it->first != functionScope && it->second.parameterTypeMap.size() == functionTable[functionName].parametersListMap[functionScope].parameterTypeMap.size())
+        if(it->first != functionScope && it->second.parameterTypeList.size() == functionTable[functionName].parametersListMap[functionScope].parameterTypeList.size())
         {
             //if the parameters have the same size we will check if the parameters are similar
             bool isSimilar = true;
-            auto startOfCurrentFunctionParameterMap = functionTable[functionName].parametersListMap[functionScope].parameterTypeMap.begin();
-            for (auto it2 = it->second.parameterTypeMap.begin(); it2 != it->second.parameterTypeMap.end(); ++it2)
+            auto startOfCurrentFunctionParameterMap = functionTable[functionName].parametersListMap[functionScope].parameterTypeList.begin();
+            for (auto it2 = it->second.parameterTypeList.begin(); it2 != it->second.parameterTypeList.end(); ++it2)
             {
                 //that means there exists a parameter that is not similar so we will break
-                 if(it2->second != startOfCurrentFunctionParameterMap->second)
+                 if(*it2 != *startOfCurrentFunctionParameterMap)
                  {
                      isSimilar = false;
                      break;
@@ -158,7 +158,7 @@ int checkFunctionExists(int functionScope , int returnType)
             //if the parameters are similar we will return 0 which means that the function is defined
             if(isSimilar)
             {
-                 printf("Error: Cannot have two functions that have same parameter and return value.\n");
+                 printf("Error: Cannot have two functions that have same parameters.\n");
                  return 0;
             }
         }
@@ -181,3 +181,55 @@ int getParentScope(int currentScope)
 }
 
 
+int checkArgumentList(char* name , FunctionCallParameters* ArgumentList)
+{
+    std::cout << "Checking Argument List: " << std::endl;
+    std::string functionName(name);
+    //we will check if the function exists
+    if(functionTable.find(functionName) == functionTable.end())
+    {
+        printf("Error: Function %s does not exist.\n", name);
+        return -1;
+    }
+    //we need to get scope of the function that have same number of parameters
+    std::vector <int> scopeList;
+    for (auto it = functionTable[functionName].parametersListMap.begin(); it != functionTable[functionName].parametersListMap.end(); ++it)
+    {
+        if(it->second.parameterTypeList.size() == ArgumentList->parameterTypes.size())
+        {
+            scopeList.push_back(it->first);
+        }
+    }
+    //if there is no scope that has the same number of parameters we will return -1
+    if(scopeList.size() == 0)
+    {
+        printf("Error: Function %s does not exist with that number of parameters\n", name);
+        return -1;
+    }
+    //we will check if the parameters are similar in one of the scopes we found
+    for (auto it = scopeList.begin(); it != scopeList.end(); ++it)
+    {
+        bool isSimilar = true;
+        auto startOfCurrentFunctionParameterMap = functionTable[functionName].parametersListMap[*it].parameterTypeList.begin();
+        for (auto it2 = ArgumentList->parameterTypes.begin(); it2 != ArgumentList->parameterTypes.end(); ++it2)
+        {
+            //that means there exists a parameter that is not similar so we will break
+             if(*it2 != *startOfCurrentFunctionParameterMap)
+             {
+                 isSimilar = false;
+                 break;
+             }
+             startOfCurrentFunctionParameterMap++;
+        }
+        //if the parameters are similar we will return 0 which means that the function is defined
+        if(isSimilar)
+        {
+             printf("We found a function that matches one that we called\n");
+             //return type of the function
+             return functionTable[functionName].returnTypesMap[*it];
+        }
+    }
+    //we didn't find a similar function so we will return -1
+    printf("Error: Function %s does not exist with that same type of parameters\n", name);
+    return -1;
+}
