@@ -21,6 +21,10 @@ void executeBinaryOperation(std::string operation, int tempVariablesCount);
 void printQuadrupleTable();
 void executeUnaryOperation(std::string operation, int tempVariablesCount);
 void assignmentQuadruple(std::string operand);
+void createLabel(int labelNumber);
+void exitLabel(int labelNumber);
+void jumpLabel(int labelNumber);
+void conditionLabelIfNot(int labelNumber);
 
 
 #ifdef __cplusplus

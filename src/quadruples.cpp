@@ -68,23 +68,45 @@ void assignmentQuadruple(std::string destination)
 
 void printQuadruple(QuadrupleStruct quad)
 {
-    std::cout << "(" << quad.operand1 << ", " << quad.operand2 << ", " << quad.operation << ", " << quad.destination << ")" << std::endl;
+    std::cout << "("  << quad.destination << ", " << quad.operand1 << ", " << quad.operation << ", " << quad.operand2 << ")" << std::endl;
 }
 
 void printQuadrupleTable()
 {
     std::cout << "Quadruples Table:" << std::endl;
-    std::cout << "Op1, Op2, Op, Dest" << std::endl;
+    std::cout << "Dest, Op1 , Operation , Op2" << std::endl;
     for (int i = 0; i < quadruplesTable.size(); i++)
     {
         printQuadruple(quadruplesTable[i]);
     }
 }
 
-void executeUnaryOperand(char * operand)
+void createLabel(int labelNumber)
 {
-    std::string operandName(operand);
+    QuadrupleStruct quadruple = {"", "", "label", "L" + std::to_string(labelNumber)};
+    quadruplesTable.push_back(quadruple);
+}
 
+void exitLabel(int labelNumber)
+{
+    std::string expressionStack = popStack();
+    QuadrupleStruct quadruple = {"if", expressionStack, "goto", "L" + std::to_string(labelNumber)};
+    quadruplesTable.push_back(quadruple);
+}
+
+void jumpLabel(int labelNumber)
+{
+    QuadrupleStruct quadruple = {"","", "goto", "L" + std::to_string(labelNumber)};
+    quadruplesTable.push_back(quadruple);
+}
+
+void conditionLabelIfNot(int labelNumber)
+{
+    std::string expressionStack = popStack();
+    QuadrupleStruct quadruple = {"if not", expressionStack, "goto", "L" + std::to_string(labelNumber)};
+    quadruplesTable.push_back(quadruple);
 }
 
 
+//TODO: switch
+//TODO: functions:

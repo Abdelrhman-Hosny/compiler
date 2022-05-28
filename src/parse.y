@@ -438,21 +438,31 @@ stmt : variable_declaration |
         ';'
 
  /* Loops */
-optional_expression : expression {$$ = $1;}|{$$ = NULL;}
+optional_expression : expression {$$ = $1;}|{$$ = NULL; pushToStack("1");}
 
 for_assignment: INT_DECLARATION ID '=' expression {
                                 int ret = createVariable($2, currentScope, INT_TYPE, !IS_CONSTANT,0);
                                 if (ret == -1) exit(-1);
-
                                 ret = assignVariable($2, $4, currentScope);
+                                std::string assignmentDestination($2);
+                                assignmentQuadruple(assignmentDestination);
                                 if (ret == -1) exit(-1);} | assignment |
 
 //TODO:loops and check expression is in currentScope and defined before
-loop: WHILE '(' expression ')' {checkIsChar($3->type,yylineno);} block |
-        FOR {createNewScope(currentScope,scopeCount);currentScope = ++scopeCount;} 
+loop: WHILE {createNewScope(currentScope,scopeCount); currentScope = ++scopeCount;} 
+        '(' expression ')' {checkIsChar($4->type,yylineno); 
+        createNewScope(currentScope,scopeCount); currentScope = ++scopeCount; createLabel(currentScope);
+        conditionLabelIfNot(getParentScope(currentScope));} 
+        block {
+        jumpLabel(currentScope); currentScope = getParentScope(currentScope);
+        createLabel(currentScope); currentScope = getParentScope(currentScope);}|
+
+        FOR {createNewScope(currentScope,scopeCount); currentScope = ++scopeCount; createLabel(currentScope);} 
         '(' for_assignment ';' optional_expression ';' for_assignment ')' {checkIsCharFor($6,yylineno);}
-        block {currentScope = getParentScope(currentScope);}|
-        DO block WHILE '(' expression ')' ';' {checkIsChar($5->type,yylineno);}
+        block {exitLabel(currentScope); currentScope = getParentScope(currentScope);}|
+
+        DO {createNewScope(currentScope,scopeCount); currentScope = ++scopeCount; createLabel(currentScope);} 
+        block WHILE '(' expression ')' ';' {checkIsChar($6->type,yylineno); exitLabel(currentScope); currentScope = getParentScope(currentScope);}
 
  /* Conditional statements */
 
@@ -460,9 +470,24 @@ conditional: switch_case |
             if_statement
 
 
-if_statement: IF  '(' expression  ')' {checkIsChar($3->type,yylineno);} stmt end_if 
+if_statement: IF {createNewScope(currentScope,scopeCount); currentScope = ++scopeCount;}  '(' expression  ')' 
+                 {checkIsChar($4->type,yylineno); 
+                 createNewScope(currentScope,scopeCount); 
+                 currentScope = ++scopeCount; 
+                 conditionLabelIfNot(currentScope);} 
+                 stmt 
+                 {jumpLabel(getParentScope(currentScope)); 
+                 createLabel(currentScope); 
+                 currentScope = getParentScope(currentScope);
+                 } end_if 
 
-end_if: %prec IFX | ELSE  stmt 
+end_if: %prec IFX  { 
+                 createLabel(currentScope); 
+                 currentScope = getParentScope(currentScope);
+                 } | ELSE  stmt { 
+                 createLabel(currentScope); 
+                 currentScope = getParentScope(currentScope);
+                 } 
 
 switch_case: SWITCH '(' ID ')' '{'{createNewScope(currentScope,scopeCount);currentScope = ++scopeCount;} case_list '}' {currentScope = getParentScope(currentScope);}
 //TODO: switch case
