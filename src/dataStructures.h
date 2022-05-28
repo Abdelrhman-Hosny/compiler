@@ -1,4 +1,5 @@
 #pragma once
+#define getNumValue(data) (data->type == INT_TYPE) ? 1.0 * data->intValue : data->doubleValue
 
 #include "constants.h"
 #include <stdio.h>
@@ -10,9 +11,3 @@ struct ExpressionData
     char charValue;
     int valueIsValid = 0;
 };
-
-double getNumValue(struct ExpressionData* data)
-{
-    double value = (data->type == INT_TYPE) ? data->intValue : data->doubleValue;
-    return value;
-}
