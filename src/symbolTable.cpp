@@ -1,5 +1,4 @@
 #include "symbolTable.h"
-#include "constants.h"
 #include <iostream>
 #include <vector>
 #include <string>
@@ -48,7 +47,25 @@ struct functionStruct
 std::unordered_map<int, scopeStruct> scopeTable;
 std::unordered_map<std::string, functionStruct> functionTable;
 
+int getScopeOfVariable(std::string name, int currentScope)
+{
+    struct scopeStruct currentScopeStruct = scopeTable[currentScope];
 
+    if (currentScopeStruct.variables.find(name) != currentScopeStruct.variables.end())
+    {
+        return currentScope;
+    }
+    else
+    {
+        // TODO : Make the global scope have a parent of -1
+        if (currentScopeStruct.parentScope == -1)
+            // means that currentScope = global scope and we couldn't find the variable there
+            return -1;
+        else
+            return getScopeOfVariable(name, currentScopeStruct.parentScope);
+        
+    }
+}
 
 int createVariable(char *name, int scope, int type ,int isConstant , int isAssigned)
 {
@@ -59,7 +76,7 @@ int createVariable(char *name, int scope, int type ,int isConstant , int isAssig
     // Check if variable already exists in this scope
     if (scopeTable[scope].variables.find(variableName) != scopeTable[scope].variables.end())
     {
-        std::cout << "Variable " << variableName << " already exists in scope " << scope << std::endl;
+        std::cout << "Error: Variable " << variableName << " already exists in scope " << scope << std::endl;
         return -1;
     }
 
@@ -67,6 +84,57 @@ int createVariable(char *name, int scope, int type ,int isConstant , int isAssig
     variableData varData = {type, isAssigned, isConstant};
     scopeTable[scope].variables[variableName] =  varData;
     
+    return 1;
+}
+
+int assignVariable(char *name, struct ExpressionData * expressionData, int scope)
+{
+    // when we assign a variable, we have to handle
+    // scopes, constants, variable types and isAssigned
+    std::string variableName(name);
+
+    // handling scope
+    int scopeOfVariable = getScopeOfVariable(variableName, scope);
+
+    if (scopeOfVariable == -1)
+    {
+        std::cout << "Error: Variable " << variableName << " does not exist in scope " << scope << std::endl;
+        return -1;
+    }
+
+    struct variableData varData = scopeTable[scopeOfVariable].variables[variableName];
+
+
+    // handling types
+    // check that types are the same
+    // if variable is double and expression is int, it can be assigned
+    if (varData.type != expressionData->type && !(varData.type == FLOAT_TYPE && expressionData->type == INT_TYPE))
+    {
+        std::cout << "Error: Variable " << variableName << " in scope " << scope << " has type " << varData.type << " and cannot be assigned type " << expressionData->type << std::endl;
+        return -1;
+    }
+
+
+    // handling constants
+    if (varData.isConstant == 1)
+    {
+        if (varData.isAssigned == 0)
+        {
+            varData.isAssigned = 1;
+
+        } else {
+
+            std::cout << "Error : Variable " << variableName << " is constant in scope " << scope << std::endl;
+            return -1;
+        }
+    }
+
+    scopeTable[scopeOfVariable].variables[variableName] = varData;
+   return 1; 
+}
+
+int getVariableType(char * name, int currentScope)
+{
     return 1;
 }
 
