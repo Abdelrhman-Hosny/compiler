@@ -43,8 +43,8 @@ int currentScope = 0, scopeCount = 0;
 %token <intValue> INTEGER
 %token <charValue> CHARACTER
 
-%type <identifierName> assignment
-%type <expressionData> math_expr boolean_expr expression function_call
+%type <identifierName> assignment for_assignment
+%type <expressionData> math_expr boolean_expr expression function_call optional_expression loop
 %type <stringValue> parameter_list parameter
 %type <functionCallParameters> argument_list
 /*
@@ -189,8 +189,8 @@ assignment: ID '=' expression {
                                 if (ret == -1) exit(-1);
 }
 
-expression : math_expr {$$=$1}|
-                boolean_expr {$$=$1}
+expression : math_expr {$$=$1;}|
+                boolean_expr {$$=$1;}
 
   /* mathematical expression */
 math_expr : INTEGER 
@@ -373,7 +373,7 @@ stmt : variable_declaration |
         expression ';' |
         loop |
         conditional |
-        BREAK ';' |
+        BREAK ';' | //TODO: add break and CONTINUE
         CONTINUE ';' |
         RETURN ';' {int result = checkReturn(currentScope,VOID_TYPE); if(result==-1) exit(-1);}|
         RETURN expression ';' {int result = checkReturn(currentScope,$2->type); if(result==-1) exit(-1);} |
@@ -381,26 +381,34 @@ stmt : variable_declaration |
         ';'
 
  /* Loops */
-optional_expression : expression |
+optional_expression : expression {$$ = $1;}|{$$ = NULL;}
 
-for_assignment: INT_DECLARATION assignment |
-                assignment |
+for_assignment: INT_DECLARATION ID '=' expression {
+                                int ret = createVariable($2, currentScope, INT_TYPE, !IS_CONSTANT,0);
+                                if (ret == -1) exit(-1);
 
-loop: WHILE '(' optional_expression ')' block |
-        FOR '(' for_assignment ';' optional_expression ';' for_assignment ')' block |
-        DO block WHILE '(' optional_expression ')' ';'
+                                ret = assignVariable($2, $4, currentScope);
+                                if (ret == -1) exit(-1);} | assignment |
+
+//TODO:loops and check expression is in currentScope and defined before
+loop: WHILE '(' expression ')' {checkIsChar($3->type,yylineno);} block |
+        FOR {createNewScope(currentScope,scopeCount);currentScope = ++scopeCount;} 
+        '(' for_assignment ';' optional_expression ';' for_assignment ')' {checkIsCharFor($6,yylineno);}
+        block {currentScope = getParentScope(currentScope);}|
+        DO block WHILE '(' expression ')' ';' {checkIsChar($5->type,yylineno);}
 
  /* Conditional statements */
 
 conditional: switch_case |
             if_statement
 
-if_statement: IF  '(' expression  ')' stmt end_if 
+
+if_statement: IF  '(' expression  ')' {checkIsChar($3->type,yylineno);} stmt end_if 
 
 end_if: %prec IFX | ELSE  stmt 
 
 switch_case: SWITCH '(' ID ')' '{'{createNewScope(currentScope,scopeCount);currentScope = ++scopeCount;} case_list '}' {currentScope = getParentScope(currentScope);}
-
+//TODO: switch case
 case_list:  case_clause case_list|
             DEFAULT ':' stmt_list|
 

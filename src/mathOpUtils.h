@@ -14,7 +14,7 @@ struct ExpressionData * binaryMathExpression(struct ExpressionData * returnOp,
     int lType = leftOp->type;
     int rType = rightOp->type;
 
-
+    //TODO: allow comparsion of two characters
     if ( lType == CHAR_TYPE || rType == CHAR_TYPE)
     {
         printf("Error: Cannot perform arithmetic operation on char\n");
@@ -142,6 +142,7 @@ struct ExpressionData * binaryLogicalExpression(struct ExpressionData * returnOp
     int lType = leftOp->type;
     int rType = rightOp->type;
 
+    //TODO: allow comparsion of two characters
     if ( lType == CHAR_TYPE || rType == CHAR_TYPE)
     {
         printf("Error: Cannot perform logical operation on char\n");

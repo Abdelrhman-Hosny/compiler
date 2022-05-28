@@ -29,6 +29,8 @@ extern "C" {
     int checkFunctionExists(int functionScope , int returnType);
     int checkArgumentList(char* name ,FunctionCallParameters* ArgumentList);
     int checkReturn(int scope , int type);
+    int checkIsChar(int type , int numberLine);
+    int checkIsCharFor(ExpressionData* value , int numberLine);
 #ifdef __cplusplus
     }
 #endif

@@ -322,3 +322,26 @@ int checkReturn(int scope , int type)
     }
     return 1;
 }
+
+
+int checkIsChar(int type, int numberLine){
+    if(type == CHAR_TYPE)
+    {
+      printf("Error: if conditional can't be CHARACTER at line number: %d\n",numberLine); 
+      exit(-1);
+    }
+    return 1;
+}
+
+int checkIsCharFor(ExpressionData* expressionData , int numberLine){ 
+    if(expressionData == NULL)
+    {
+        return 1;
+    }
+    if(expressionData->type == CHAR_TYPE)
+    {
+      printf("Error: if conditional can't be CHARACTER at line number: %d\n" , numberLine); 
+      exit(-1);
+    }
+    return 1;
+}
