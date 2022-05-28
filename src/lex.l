@@ -2,7 +2,7 @@
 #include "parse.tab.h"
 #include <stdio.h>
 
-int yylineno;
+// int yylineno;
 void yyerror(char *);
 %}
 
