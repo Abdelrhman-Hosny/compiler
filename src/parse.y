@@ -183,7 +183,7 @@ variable_declaration: INT_DECLARATION ID ';'
                         }
 
 
-//TODO: check if variable exists in the parent scope
+
 assignment: ID '=' expression {
                                 int ret = assignVariable($1, $3, currentScope);
                                 if (ret == -1) exit(-1);
@@ -211,11 +211,9 @@ math_expr : INTEGER
             |
             ID 
             {
-                // TODO
                 // get variable value from sybmol table and handle the error
                 // create a new expression data
                 $$ = createExpressionMacro;
-                // TODO : getVariable(char *name, scope) return VarType
                 int variableType = getVariableType($1, currentScope);
 
                 if (variableType == -1)
@@ -246,7 +244,6 @@ math_expr : INTEGER
             |
             function_call 
             {
-                // TODO : check that the types match
                 // if you've reached this point, this means that the function
                 // exists and parameters are satisfied
                 // so , we'll need to return the the return type of the function
@@ -378,8 +375,8 @@ stmt : variable_declaration |
         conditional |
         BREAK ';' |
         CONTINUE ';' |
-        RETURN ';' | //TODO: check if return is in the correct place
-        RETURN expression ';' |
+        RETURN ';' {int result = checkReturn(currentScope,VOID_TYPE); if(result==-1) exit(-1);}|
+        RETURN expression ';' {int result = checkReturn(currentScope,$2->type); if(result==-1) exit(-1);} |
         block |
         ';'
 
@@ -437,6 +434,6 @@ int main(int argc, char* argv[])
         yyparse();
     } while (!feof(yyin));
 
-    printSymbolTable();
+    //printSymbolTable();
 }
 

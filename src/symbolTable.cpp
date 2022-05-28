@@ -311,3 +311,15 @@ int checkArgumentList(char* name , FunctionCallParameters* ArgumentList)
     printf("Error: Function %s does not exist with that same type of parameters\n", name);
     return -1;
 }
+
+
+int checkReturn(int scope , int type)
+{
+    int functionType = functionTable[scopeTable[scope].functionName].returnTypesMap[scope];
+    if (functionType != type && !(functionType == FLOAT_TYPE && type == INT_TYPE))
+    {
+        std::cout << "different return type" << std::endl;
+        return -1;
+    }
+    return 1;
+}

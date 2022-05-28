@@ -28,6 +28,7 @@ extern "C" {
     int getParentScope(int currentScope);
     int checkFunctionExists(int functionScope , int returnType);
     int checkArgumentList(char* name ,FunctionCallParameters* ArgumentList);
+    int checkReturn(int scope , int type);
 #ifdef __cplusplus
     }
 #endif
