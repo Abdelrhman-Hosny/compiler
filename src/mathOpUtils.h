@@ -3,7 +3,6 @@
 #define createExpressionMacro (struct ExpressionData*) malloc(sizeof(struct ExpressionData))
 
 #include "dataStructures.h"
-#include "constants.h"
 #include <stdio.h>
 #include <cstdlib>
 
@@ -64,7 +63,7 @@ struct ExpressionData * binaryMathExpression(struct ExpressionData * returnOp,
                 returnOp->doubleValue = getNumValue(leftOp) / getNumValue(rightOp);
                 break; 
             case MOD_OP:
-                printf("Two operators of mod operator - \% - must be of type integer\n");
+                printf("Error: Two operators of mod operator - \% - must be of type integer\n");
                 break;
             default:
                 printf("Error: Invalid operation\n");
