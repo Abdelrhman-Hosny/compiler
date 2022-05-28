@@ -1,9 +1,11 @@
 #pragma once
-
+#include "mathOpUtils.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
     int createVariable(char * name, int scope, int type, int isConstant, int isAssigned);
+    int assignVariable(char * name, struct ExpressionData* value, int scope);
+    int getVariableType(char * name, int scope);
     void printSymbolTable();
     // void print_operation(char* operation);
     // float get_value(char* name, int &flag); 
