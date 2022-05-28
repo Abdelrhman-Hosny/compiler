@@ -235,7 +235,7 @@ struct ExpressionData * unaryMinusMathExpression(struct ExpressionData * leftOp)
 
 }
 
-struct ExpressionData * notLogicalOperator(struct ExpressionData * leftOp)
+struct ExpressionData * notLogicalOperation(struct ExpressionData * leftOp)
 {
     int lType = leftOp->type;
 
