@@ -43,7 +43,7 @@ struct functionStruct
 
 };
 
-// TODO: Create Scope zero before start of program
+
 std::unordered_map<int, scopeStruct> scopeTable;
 std::unordered_map<std::string, functionStruct> functionTable;
 
@@ -57,8 +57,7 @@ int getScopeOfVariable(std::string name, int currentScope)
     }
     else
     {
-        // TODO : Make the global scope have a parent of -1
-        if (currentScopeStruct.parentScope == -1)
+        if (currentScopeStruct.parentScope == currentScope)
             // means that currentScope = global scope and we couldn't find the variable there
             return -1;
         else
