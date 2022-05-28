@@ -71,7 +71,7 @@ int createVariable(char *name, int scope, int type ,int isConstant , int isAssig
 {
     std::string variableName(name);
 
-    std::cout << "Creating variable " << variableName << " in scope " << scope << std::endl;
+    //std::cout << "Creating variable " << variableName << " in scope " << scope << std::endl;
 
     // Check if variable already exists in this scope
     if (scopeTable[scope].variables.find(variableName) != scopeTable[scope].variables.end())
@@ -196,7 +196,7 @@ int addParameter(char* name, int type, int scope)
     std::string parameterName(name);
     scope++;
     std::string functionName = scopeTable[scope].functionName;
-    std::cout << "Adding parameter " << parameterName << " in scope " << functionName << std::endl;
+    //std::cout << "Adding parameter " << parameterName << " in scope " << functionName << std::endl;
     functionTable[functionName].parametersListMap[scope].parameterTypeList.push_back(type);
     int isDuplicated = createVariable(name, scope, type, 0, 1);
     if(isDuplicated == -1)

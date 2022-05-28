@@ -189,8 +189,8 @@ assignment: ID '=' expression {
                                 if (ret == -1) exit(-1);
 }
 
-expression : math_expr |
-                boolean_expr
+expression : math_expr {$$=$1}|
+                boolean_expr {$$=$1}
 
   /* mathematical expression */
 math_expr : INTEGER 
@@ -213,7 +213,6 @@ math_expr : INTEGER
             {
                 // TODO
                 // get variable value from sybmol table and handle the error
-
                 // create a new expression data
                 $$ = createExpressionMacro;
                 // TODO : getVariable(char *name, scope) return VarType
@@ -226,7 +225,7 @@ math_expr : INTEGER
                     free($$);
                     exit(-1);
                 }
-
+                $$->type = variableType;
                 // we will treat all variables as if their values were unknown
                 // even if they are assigned i.e , we won't store the value
                 // of int x = 3;
@@ -251,7 +250,7 @@ math_expr : INTEGER
                 // if you've reached this point, this means that the function
                 // exists and parameters are satisfied
                 // so , we'll need to return the the return type of the function
-                
+                $$ = $1;       
             }
             |
             math_expr '+' math_expr 
