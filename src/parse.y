@@ -89,7 +89,6 @@ parameter: INT_DECLARATION ID  {if(!addParameter($2,INT_TYPE,scopeCount)) exit(-
             CHAR_DECLARATION ID {if(!addParameter($2,CHAR_TYPE,scopeCount))  exit(-1);}|
             FLOAT_DECLARATION ID{if(!addParameter($2,FLOAT_TYPE,scopeCount))  exit(-1);}
 
-//TODO: add Function calls
 /* Function calls */
 /* type expressionData type isValid = 0*/
 function_call: ID '(' argument_list ')' {printf("ID function call: %s\n",$1);}
@@ -151,7 +150,7 @@ assignment: ID '=' expression
 expression : math_expr |
                 boolean_expr
 
-  /* mathematical expression //TODO: fix % */
+  /* mathematical expression */
 math_expr : INTEGER 
             {
                 $$ = createExpressionMacro;
