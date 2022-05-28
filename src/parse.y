@@ -20,6 +20,7 @@ int currentScope = 0, scopeCount = 0;
     char* stringValue;
     char* identifierName;
     struct ExpressionData* expressionData;
+    struct FunctionCallParameters* functionCallParameters;
 }
 
 %start program
@@ -45,6 +46,7 @@ int currentScope = 0, scopeCount = 0;
 %type <identifierName> assignment
 %type <expressionData> math_expr boolean_expr expression function_call
 %type <stringValue> parameter_list parameter
+%type <functionCallParameters> argument_list
 /*
 by declaring %left '+' before %left '*', this gives precedence to '*'
 the lower you declare something, the higher precedence it has
@@ -83,17 +85,22 @@ function_declaration:   INT_DECLARATION ID {createNewFunction(scopeCount,$2,INT_
 parameter_list: parameter|
                 parameter_list ',' parameter|
 
-parameter: INT_DECLARATION ID  {if(!addParameter($2,INT_TYPE,scopeCount)) exit(-1);}|
+parameter:  INT_DECLARATION ID  {if(!addParameter($2,INT_TYPE,scopeCount)) exit(-1);}|
             CHAR_DECLARATION ID {if(!addParameter($2,CHAR_TYPE,scopeCount))  exit(-1);}|
             FLOAT_DECLARATION ID{if(!addParameter($2,FLOAT_TYPE,scopeCount))  exit(-1);}
 
 /* Function calls */
 /* type expressionData type isValid = 0*/
-function_call: ID '(' argument_list ')' {printf("ID function call: %s\n",$1);}
+function_call: ID '(' argument_list ')' {
+                int returnType = checkArgumentList($1,$3); if(returnType == -1) exit(-1);
+                $$ = createExpressionMacro;
+                $$->type = returnType;
+                $$->valueIsValid = 0;
+                }
 
 //we will make counter and check on type of each argrument
-argument_list: expression {printf("type: %f\n",$1->type);}|
-                argument_list ',' expression  {printf("type: %f\n",$3->type);}|
+argument_list: expression {$$ = new struct FunctionCallParameters(); $$->parameterTypes.push_back($1->type);}|
+                argument_list ',' expression  {$$->parameterTypes.push_back($3->type);}|
 
 /* Variable declaration and assignment */
 variable_declaration: INT_DECLARATION ID ';'

@@ -2,8 +2,12 @@
 #include "dataStructures.h"
 
 #ifdef __cplusplus
+#include <vector>
 extern "C" {
 #endif
+    struct FunctionCallParameters{
+        std::vector<int> parameterTypes;
+    };
     int createVariable(char * name, int scope, int type, int isConstant, int isAssigned);
     int assignVariable(char * name, struct ExpressionData* value, int scope);
     int getVariableType(char * name, int scope);
@@ -23,6 +27,7 @@ extern "C" {
     void createNewFunction(int currentScope,char* name , int returnType);
     int getParentScope(int currentScope);
     int checkFunctionExists(int functionScope , int returnType);
+    int checkArgumentList(char* name ,FunctionCallParameters* ArgumentList);
 #ifdef __cplusplus
     }
 #endif
