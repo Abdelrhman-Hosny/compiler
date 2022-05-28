@@ -135,7 +135,17 @@ int assignVariable(char *name, struct ExpressionData * expressionData, int scope
 
 int getVariableType(char * name, int currentScope)
 {
-    return 1;
+    std::string variableName(name);
+
+    int scopeOfVariable = getScopeOfVariable(variableName, currentScope);
+
+    if (scopeOfVariable == -1)
+    {
+        std::cout << "Error: Variable " << variableName << " does not exist in scope " << currentScope << std::endl;
+        return -1;
+    }   
+
+    return scopeTable[scopeOfVariable].variables[variableName].type;
 }
 
 void printSymbolTable()
