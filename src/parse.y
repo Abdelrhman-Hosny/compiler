@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "mathOpUtils.h"
 #include "symbolTable.h"
+#include "quadruples.h"
 #include <string.h>
 void yyerror(char *s);
 int yylex();
@@ -10,6 +11,7 @@ extern FILE *yyin;
 extern int yylineno;
 // when we exit current scope, we return to the parent
 int currentScope = 0, scopeCount = 0;
+int currentTempCount = 0;
 %}
 
 // Start of Yacc definitions
@@ -128,6 +130,9 @@ variable_declaration: INT_DECLARATION ID ';'
                             
                             ret = assignVariable($3, $5, currentScope);
                             if (ret == -1) exit(-1);
+                            
+                            std::string assignmentDestination($3);
+                            assignmentQuadruple(assignmentDestination);
 
                         }
                         |
@@ -138,6 +143,8 @@ variable_declaration: INT_DECLARATION ID ';'
                             ret = assignVariable($3, $5, currentScope);
                             if (ret == -1) exit(-1);
 
+                            std::string assignmentDestination($3);
+                            assignmentQuadruple(assignmentDestination);
 
                         }
                         |
@@ -149,6 +156,8 @@ variable_declaration: INT_DECLARATION ID ';'
                             ret = assignVariable($3, $5, currentScope);
                             if (ret == -1) exit(-1);
 
+                            std::string assignmentDestination($3);
+                            assignmentQuadruple(assignmentDestination);
                         }
                         |
                         INT_DECLARATION  ID '=' expression ';'
@@ -159,6 +168,8 @@ variable_declaration: INT_DECLARATION ID ';'
                             ret = assignVariable($2, $4, currentScope);
                             if (ret == -1) exit(-1);
 
+                            std::string assignmentDestination($2);
+                            assignmentQuadruple(assignmentDestination);
                         }
                         |
                         FLOAT_DECLARATION  ID '=' expression ';'
@@ -169,6 +180,8 @@ variable_declaration: INT_DECLARATION ID ';'
                             ret = assignVariable($2, $4, currentScope);
                             if (ret == -1) exit(-1);
 
+                            std::string assignmentDestination($2);
+                            assignmentQuadruple(assignmentDestination);
                         }
                         |
                         CHAR_DECLARATION  ID '=' expression ';'
@@ -179,6 +192,8 @@ variable_declaration: INT_DECLARATION ID ';'
                             ret = assignVariable($2, $4, currentScope);
                             if (ret == -1) exit(-1);
 
+                            std::string assignmentDestination($2);
+                            assignmentQuadruple(assignmentDestination);
 
                         }
 
@@ -186,6 +201,8 @@ variable_declaration: INT_DECLARATION ID ';'
 
 assignment: ID '=' expression {
                                 int ret = assignVariable($1, $3, currentScope);
+                                std::string assignmentDestination($1);
+                                assignmentQuadruple(assignmentDestination);
                                 if (ret == -1) exit(-1);
 }
 
@@ -199,6 +216,9 @@ math_expr : INTEGER
                 $$->type = INT_TYPE;
                 $$->intValue = $1;
                 $$->valueIsValid = 1;
+
+                std::string operandToPush(std::to_string($1));
+                pushToStack(operandToPush);
             }
             |
             FLOAT 
@@ -207,7 +227,10 @@ math_expr : INTEGER
                 $$->type = FLOAT_TYPE;
                 $$->doubleValue = $1;
                 $$->valueIsValid = 1;
-            }
+
+                std::string operandToPush(std::to_string($1));
+                pushToStack(operandToPush);
+           }
             |
             ID 
             {
@@ -232,6 +255,8 @@ math_expr : INTEGER
                 // as no operations will be done
                 // only the type will be propagated.
     
+               std::string operandToPush($1);
+                pushToStack(operandToPush);
             }
             |
             CHARACTER 
@@ -240,6 +265,9 @@ math_expr : INTEGER
                 $$->type = CHAR_TYPE;
                 $$->charValue = $1;          
                 $$->valueIsValid = 1;
+
+                std::string operandToPush(std::to_string($1));
+                pushToStack(operandToPush);
             }
             |
             function_call 
@@ -253,20 +281,24 @@ math_expr : INTEGER
             math_expr '+' math_expr 
             {
                $$ = binaryMathExpression($$, $1, $3, ADD_OP);
+               executeBinaryOperation("+", currentTempCount);
+               currentTempCount++;
                if (! $$) exit(-1);
             }
             |
             math_expr '-' math_expr 
             {
                $$ = binaryMathExpression($$, $1, $3, SUB_OP);
-
+               executeBinaryOperation("-", currentTempCount);
+               currentTempCount++;
                if (! $$) exit(-1);
             }
             |
             math_expr '*' math_expr 
             { 
                $$ = binaryMathExpression($$, $1, $3, MUL_OP);
-
+               executeBinaryOperation("*", currentTempCount);
+               currentTempCount++;
                if (! $$) exit(-1);
 
             }
@@ -274,7 +306,8 @@ math_expr : INTEGER
             math_expr '/' math_expr 
             {
                $$ = binaryMathExpression($$, $1, $3, DIV_OP);
-
+               executeBinaryOperation("/", currentTempCount);
+               currentTempCount++;
                 if (! $$) exit(-1);
 
             }
@@ -283,7 +316,8 @@ math_expr : INTEGER
             {
                 
                $$ = binaryMathExpression($$, $1, $3, MOD_OP);
-
+               executeBinaryOperation("%", currentTempCount);
+               currentTempCount++;
                 if (! $$) exit(-1);
 
             }
@@ -296,6 +330,8 @@ math_expr : INTEGER
             '-' math_expr %prec UNARY_MINUS 
             {
                 $$ = unaryMinusMathExpression($2);
+                executeUnaryOperation("-", currentTempCount);
+                currentTempCount++;
                 if (!$$) exit(-1);
             }
 
@@ -306,53 +342,74 @@ boolean_expr : expression '>' expression
                 {
                    $$ = binaryLogicalExpression($$, $1, $3, GT_OP);  
                    if (! $$) exit(-1);
+                    executeBinaryOperation(">", currentTempCount);
+                    currentTempCount++;
                 }
                 |
                 expression '<' expression 
                 {
                    $$ = binaryLogicalExpression($$, $1, $3, LT_OP);
                    if (! $$) exit(-1); 
+                    executeBinaryOperation("<", currentTempCount);
+                    currentTempCount++;
                 }
                 |
                 expression ">=" expression 
                 {
                    $$ = binaryLogicalExpression($$, $1, $3, GEQ_OP);
                    if (! $$) exit(-1);                    
+                    executeBinaryOperation(">=", currentTempCount);
+                    currentTempCount++;
                 }
                 |
                 expression "<=" expression 
                 {
                    $$ = binaryLogicalExpression($$, $1, $3, LT_OP);
                    if (! $$) exit(-1);                    
+                    executeBinaryOperation("<=", currentTempCount);
+                    currentTempCount++;
                 }
                 |
                expression "==" expression 
                 {
                    $$ = binaryLogicalExpression($$, $1, $3, EQ_OP);
                    if (! $$) exit(-1);                   
+                    executeBinaryOperation("==", currentTempCount);
+                    currentTempCount++;
                 }
                 |
                 expression "!=" expression 
                 {
                    $$ = binaryLogicalExpression($$, $1, $3, NEQ_OP);
                    if (! $$) exit(-1);                  
+                    executeBinaryOperation("!=", currentTempCount);
+                    currentTempCount++;
                 }
                 |
                 expression "||" expression 
                 {
                     $$ = binaryLogicalExpression($$, $1, $3, OR_OP);
                     if (! $$) exit(-1);                 
+                    executeBinaryOperation("||", currentTempCount);
+                    currentTempCount++;
                 }
                 |
                 expression "&&" expression 
                 {
                     $$ = binaryLogicalExpression($$, $1, $3, AND_OP);
-                    if (! $$) exit(-1);                
+                    if ( $$) {
+                        executeBinaryOperation("&&", currentTempCount);
+                        currentTempCount++;
+                    }
                 }
                 |
                 '!' expression 
                 {
-                    
+                    $$ = notLogicalOperation($2);
+                    if ($$){
+                        executeUnaryOperation("!", currentTempCount);
+                        currentTempCount++;
+                    }
                 } 
                 |
                 '(' boolean_expr ')'   
@@ -443,5 +500,6 @@ int main(int argc, char* argv[])
     } while (!feof(yyin));
 
     //printSymbolTable();
+    printQuadrupleTable();
 }
 
