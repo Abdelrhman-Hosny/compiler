@@ -1,10 +1,8 @@
 %{
-#include "mathOpUtils.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "constants.h"
+#include "mathOpUtils.h"
 #include "symbolTable.h"
-#include "dataStructures.h"
 #include <string.h>
 void yyerror(char *s);
 int yylex();
@@ -120,41 +118,69 @@ variable_declaration: INT_DECLARATION ID ';'
                         {
                             int ret = createVariable($3, currentScope, INT_TYPE, IS_CONSTANT,0);
                             if (ret == -1) exit(-1);
+                            
+                            ret = assignVariable($3, $5, currentScope);
+                            if (ret == -1) exit(-1);
+
                         }
                         |
                         CONST_DECLARATION FLOAT_DECLARATION  ID '=' expression ';'
                         {
                             int ret = createVariable($3, currentScope, FLOAT_TYPE, IS_CONSTANT,0);
                             if (ret == -1) exit(-1);
+                            ret = assignVariable($3, $5, currentScope);
+                            if (ret == -1) exit(-1);
+
+
                         }
                         |
                         CONST_DECLARATION CHAR_DECLARATION  ID '=' expression ';'
                         {
                             int ret = createVariable($3, currentScope, CHAR_TYPE, IS_CONSTANT,0);
                             if (ret == -1) exit(-1);
+                            
+                            ret = assignVariable($3, $5, currentScope);
+                            if (ret == -1) exit(-1);
+
                         }
                         |
                         INT_DECLARATION  ID '=' expression ';'
                         {
                             int ret = createVariable($2, currentScope, INT_TYPE, !IS_CONSTANT,0);
                             if (ret == -1) exit(-1);
+                     
+                            ret = assignVariable($2, $4, currentScope);
+                            if (ret == -1) exit(-1);
+
                         }
                         |
                         FLOAT_DECLARATION  ID '=' expression ';'
                         {
                             int ret = createVariable($2, currentScope, FLOAT_TYPE, !IS_CONSTANT,0);
                             if (ret == -1) exit(-1);
+
+                            ret = assignVariable($2, $4, currentScope);
+                            if (ret == -1) exit(-1);
+
                         }
                         |
                         CHAR_DECLARATION  ID '=' expression ';'
                         {
                             int ret = createVariable($2, currentScope, CHAR_TYPE, !IS_CONSTANT,0);
                             if (ret == -1) exit(-1);
+
+                            ret = assignVariable($2, $4, currentScope);
+                            if (ret == -1) exit(-1);
+
+
                         }
 
 
 //TODO: check if variable exists in the parent scope
-assignment: ID '=' expression 
+assignment: ID '=' expression {
+                                int ret = assignVariable($1, $3, currentScope);
+                                if (ret == -1) exit(-1);
+}
 
 expression : math_expr |
                 boolean_expr
@@ -182,12 +208,26 @@ math_expr : INTEGER
                 // get variable value from sybmol table and handle the error
 
                 // create a new expression data
-                // $$ = createExpressionMacro
-                // $$->type = variableType;
-                
-                // based on the type assign the value in the correct position
-    
+                $$ = createExpressionMacro;
+                // TODO : getVariable(char *name, scope) return VarType
+                int variableType = getVariableType($1, currentScope);
 
+                if (variableType == -1)
+                {
+                    // means that the variable was not found
+                    printf("Variable %s not found\n", $1);
+                    free($$);
+                    exit(-1);
+                }
+
+                // we will treat all variables as if their values were unknown
+                // even if they are assigned i.e , we won't store the value
+                // of int x = 3;
+                $$->valueIsValid = 0;
+                // since value is not valid no need to assign a value
+                // as no operations will be done
+                // only the type will be propagated.
+    
             }
             |
             CHARACTER 
@@ -200,7 +240,11 @@ math_expr : INTEGER
             |
             function_call 
             {
-                ;
+                // TODO : check that the types match
+                // if you've reached this point, this means that the function
+                // exists and parameters are satisfied
+                // so , we'll need to return the the return type of the function
+                
             }
             |
             math_expr '+' math_expr 
