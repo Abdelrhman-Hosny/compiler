@@ -100,47 +100,56 @@ argument_list: expression {printf("type: %f\n",$1->type);}|
 /* Variable declaration and assignment */
 variable_declaration: INT_DECLARATION ID ';'
                         {
-                            createVariable($2, currentScope, INT_TYPE, !IS_CONSTANT,0);
+                            int ret = createVariable($2, currentScope, INT_TYPE, !IS_CONSTANT,0);
+                            if (ret == -1) exit(-1);
                         }
                         |
                         FLOAT_DECLARATION ID ';'
                         {
-                            createVariable($2, currentScope, FLOAT_TYPE, !IS_CONSTANT,0);
+                            int ret = createVariable($2, currentScope, FLOAT_TYPE, !IS_CONSTANT,0);
+                            if (ret == -1) exit(-1);
                         }
                         |
                         CHAR_DECLARATION ID ';'
                         {
-                            createVariable($2, currentScope, CHAR_TYPE, !IS_CONSTANT,0);
+                            int ret = createVariable($2, currentScope, CHAR_TYPE, !IS_CONSTANT,0);
+                            if (ret == -1) exit(-1);
                         }
                         |
                         CONST_DECLARATION INT_DECLARATION  ID '=' expression ';'
                         {
-                            createVariable($3, currentScope, INT_TYPE, IS_CONSTANT,0);
+                            int ret = createVariable($3, currentScope, INT_TYPE, IS_CONSTANT,0);
+                            if (ret == -1) exit(-1);
                         }
                         |
                         CONST_DECLARATION FLOAT_DECLARATION  ID '=' expression ';'
                         {
-                            createVariable($3, currentScope, FLOAT_TYPE, IS_CONSTANT,0);
+                            int ret = createVariable($3, currentScope, FLOAT_TYPE, IS_CONSTANT,0);
+                            if (ret == -1) exit(-1);
                         }
                         |
                         CONST_DECLARATION CHAR_DECLARATION  ID '=' expression ';'
                         {
-                            createVariable($3, currentScope, CHAR_TYPE, IS_CONSTANT,0);
+                            int ret = createVariable($3, currentScope, CHAR_TYPE, IS_CONSTANT,0);
+                            if (ret == -1) exit(-1);
                         }
                         |
                         INT_DECLARATION  ID '=' expression ';'
                         {
-                            createVariable($2, currentScope, INT_TYPE, !IS_CONSTANT,0);
+                            int ret = createVariable($2, currentScope, INT_TYPE, !IS_CONSTANT,0);
+                            if (ret == -1) exit(-1);
                         }
                         |
                         FLOAT_DECLARATION  ID '=' expression ';'
                         {
-                            createVariable($2, currentScope, FLOAT_TYPE, !IS_CONSTANT,0);
+                            int ret = createVariable($2, currentScope, FLOAT_TYPE, !IS_CONSTANT,0);
+                            if (ret == -1) exit(-1);
                         }
                         |
                         CHAR_DECLARATION  ID '=' expression ';'
                         {
-                            createVariable($2, currentScope, CHAR_TYPE, !IS_CONSTANT,0);
+                            int ret = createVariable($2, currentScope, CHAR_TYPE, !IS_CONSTANT,0);
+                            if (ret == -1) exit(-1);
                         }
 
 
