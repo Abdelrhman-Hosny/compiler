@@ -66,6 +66,29 @@ void assignmentQuadruple(std::string destination)
     quadruplesTable.push_back(quadruple);
 }
 
+
+int functionQuadruple(char * funcName, FunctionCallParameters * functionCallParameters, int functionReturnType, int currentTemporaryVariable)
+{
+    std::string functionName(funcName);
+    int argumentsCount = functionCallParameters->parameterTypes.size();
+    for (int i = 0; i < argumentsCount; i++)
+    {
+        std::string parameter = popStack();
+        QuadrupleStruct quadruple = {parameter, "", "param", ""};
+        quadruplesTable.push_back(quadruple);
+    }
+
+    std::string destination = (functionReturnType == VOID_TYPE) ? "" : "t" + std::to_string(currentTemporaryVariable);
+    currentTemporaryVariable = (functionReturnType == VOID_TYPE) ? currentTemporaryVariable : currentTemporaryVariable + 1;
+
+    if (functionReturnType != VOID_TYPE) pushToStack(destination);
+
+    QuadrupleStruct quadruple = {functionName, std::to_string(argumentsCount), "call", destination};
+    quadruplesTable.push_back(quadruple);
+    return currentTemporaryVariable;
+}
+
+
 void printQuadruple(QuadrupleStruct quad)
 {
     std::cout << "("  << quad.destination << ", " << quad.operand1 << ", " << quad.operation << ", " << quad.operand2 << ")" << std::endl;

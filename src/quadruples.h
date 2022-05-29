@@ -5,6 +5,7 @@
 
 #ifdef __cplusplus
 #include <string>
+#include "symbolTable.h"
 extern "C" {
 #endif
 
@@ -25,6 +26,7 @@ void createLabel(int labelNumber);
 void exitLabel(int labelNumber);
 void jumpLabel(int labelNumber);
 void conditionLabelIfNot(int labelNumber);
+int functionQuadruple(char * functionName, FunctionCallParameters * functionCallParameters, int functionReturnType, int currentTemporaryVariable);
 
 
 #ifdef __cplusplus

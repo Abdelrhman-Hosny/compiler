@@ -95,6 +95,12 @@ parameter:  INT_DECLARATION ID  {if(!addParameter($2,INT_TYPE,scopeCount)) exit(
 /* type expressionData type isValid = 0*/
 function_call: ID '(' argument_list ')' {
                 int returnType = checkArgumentList($1,$3); if(returnType == -1) exit(-1);
+
+                // quadruple creation
+                // we don't increase temp count as if the function is void, we won't use it
+                // so we check for that inside the fn
+                currentTempCount = functionQuadruple($1, $3, returnType, currentTempCount);
+                // ExpressionData creation
                 $$ = createExpressionMacro;
                 $$->type = returnType;
                 $$->valueIsValid = 0;
