@@ -25,3 +25,9 @@
 #define NEQ_OP 5
 #define GT_OP 6
 #define LT_OP 7
+
+
+//Types for blocks
+#define BLOCK_TYPE_LOOPS 0
+#define BLOCK_TYPE_SWITCH 1
+#define BLOCK_TYPE_OTHER 2

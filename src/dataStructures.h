@@ -11,3 +11,11 @@ struct ExpressionData
     char charValue;
     int valueIsValid = 0;
 };
+
+struct CaseData
+{
+    int type;
+    int intValue;
+    char charValue;
+    char* name = nullptr;
+};

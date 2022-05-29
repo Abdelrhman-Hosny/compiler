@@ -131,5 +131,4 @@ void conditionLabelIfNot(int labelNumber)
 }
 
 
-//TODO: switch
-//TODO: functions:
+//TODO: switch , break , return , continue
