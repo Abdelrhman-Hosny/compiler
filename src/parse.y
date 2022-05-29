@@ -447,7 +447,7 @@ stmt : variable_declaration |
         conditional |
         BREAK ';' | //TODO: add break and CONTINUE
         CONTINUE ';' |
-        RETURN ';' {int result = checkReturn(currentScope,VOID_TYPE); }| // TODO: return quadruple
+        RETURN ';' {int result = checkReturn(currentScope,VOID_TYPE); }|
         RETURN expression ';' 
         {
             int result = checkReturn(currentScope,$2->type);
