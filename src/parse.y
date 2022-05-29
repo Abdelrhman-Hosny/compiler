@@ -342,57 +342,64 @@ math_expr : INTEGER
 boolean_expr : expression '>' expression 
                 {
                    $$ = binaryLogicalExpression($$, $1, $3, GT_OP);  
-                   if (! $$) exit(-1);
-                    executeBinaryOperation(">", currentTempCount);
-                    currentTempCount++;
+                   if ($$) {
+                        executeBinaryOperation(">", currentTempCount);
+                        currentTempCount++;
+                    }
                 }
                 |
                 expression '<' expression 
                 {
                    $$ = binaryLogicalExpression($$, $1, $3, LT_OP);
-                   if (! $$) exit(-1); 
-                    executeBinaryOperation("<", currentTempCount);
-                    currentTempCount++;
+                   if ($$) {
+                        executeBinaryOperation("<", currentTempCount);
+                        currentTempCount++;
+                   }
                 }
                 |
                 expression ">=" expression 
                 {
                    $$ = binaryLogicalExpression($$, $1, $3, GEQ_OP);
-                   if (! $$) exit(-1);                    
-                    executeBinaryOperation(">=", currentTempCount);
-                    currentTempCount++;
+                   if ($$){
+                        executeBinaryOperation(">=", currentTempCount);
+                        currentTempCount++;
+                   }
                 }
                 |
                 expression "<=" expression 
                 {
                    $$ = binaryLogicalExpression($$, $1, $3, LT_OP);
-                   if (! $$) exit(-1);                    
-                    executeBinaryOperation("<=", currentTempCount);
-                    currentTempCount++;
+                   if ($$){
+                        executeBinaryOperation("<=", currentTempCount);
+                        currentTempCount++;
+                   }
                 }
                 |
                expression "==" expression 
                 {
                    $$ = binaryLogicalExpression($$, $1, $3, EQ_OP);
-                   if (! $$) exit(-1);                   
-                    executeBinaryOperation("==", currentTempCount);
-                    currentTempCount++;
+                   if ($$){
+                        executeBinaryOperation("==", currentTempCount);
+                        currentTempCount++;
+                   }
                 }
                 |
                 expression "!=" expression 
                 {
                    $$ = binaryLogicalExpression($$, $1, $3, NEQ_OP);
-                   if (! $$) exit(-1);                  
-                    executeBinaryOperation("!=", currentTempCount);
-                    currentTempCount++;
+                   if ($$){
+                        executeBinaryOperation("!=", currentTempCount);
+                        currentTempCount++;
+                   }
                 }
                 |
                 expression "||" expression 
                 {
                     $$ = binaryLogicalExpression($$, $1, $3, OR_OP);
-                    if (! $$) exit(-1);                 
-                    executeBinaryOperation("||", currentTempCount);
-                    currentTempCount++;
+                    if ($$){
+                        executeBinaryOperation("||", currentTempCount);
+                        currentTempCount++;
+                   }
                 }
                 |
                 expression "&&" expression 
