@@ -1,13 +1,58 @@
 #pragma once
 #include "dataStructures.h"
+#include <unordered_map>
+#include <string>
 
 #ifdef __cplusplus
 #include <vector>
 extern "C" {
 #endif
+
+    // struct definitions
+    struct variableData {
+        int type;
+        int isAssigned;
+        int isConstant;
+
+    };
+
+    struct scopeStruct
+    {
+
+        std::unordered_map<std::string, variableData> variables;
+        int parentScope;
+        std::string functionName = "";
+
+    };
+
+    struct parameterListStruct {
+        // x( int y )
+        // will cause us to store y : INT_TYPE in the map
+        // key is variable name, value is type
+        std::vector <int> parameterTypeList;
+    };
+
+
+    struct functionStruct
+    {
+        //std::vector<parameterListStruct> parametersList;  
+        //(scope as key to add the right parameters , parametersList as value)
+        std::unordered_map<int,parameterListStruct> parametersListMap;  
+        //std::vector<int> returnTypes;
+        //(scope as key to add the right parameters , returnTypesMap as value)
+        std::unordered_map<int,int> returnTypesMap;
+
+
+    };
+
+
     struct FunctionCallParameters{
         std::vector<int> parameterTypes;
     };
+
+
+    // function definitions
+
     int createVariable(char * name, int scope, int type, int isConstant, int isAssigned);
     int assignVariable(char * name, struct ExpressionData* value, int scope);
     int getVariableType(char * name, int scope);
@@ -31,6 +76,8 @@ extern "C" {
     int checkReturn(int scope , int type);
     int checkIsChar(int type , int numberLine);
     int checkIsCharFor(ExpressionData* value , int numberLine);
+    int getNumParamsOfFunction(int functionScope);
+    
 #ifdef __cplusplus
     }
 #endif

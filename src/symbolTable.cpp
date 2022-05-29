@@ -6,44 +6,6 @@
 #include <map>
 
 
-
-struct variableData {
-    int type;
-    int isAssigned;
-    int isConstant;
-
-};
-
-struct scopeStruct
-{
-
-    std::unordered_map<std::string, variableData> variables;
-    int parentScope;
-    std::string functionName = "";
-
-};
-
-struct parameterListStruct {
-    // x( int y )
-    // will cause us to store y : INT_TYPE in the map
-    // key is variable name, value is type
-    std::vector <int> parameterTypeList;
-};
-
-
-struct functionStruct
-{
-    //std::vector<parameterListStruct> parametersList;  
-    //(scope as key to add the right parameters , parametersList as value)
-    std::unordered_map<int,parameterListStruct> parametersListMap;  
-    //std::vector<int> returnTypes;
-    //(scope as key to add the right parameters , returnTypesMap as value)
-    std::unordered_map<int,int> returnTypesMap;
-
-
-};
-
-
 std::unordered_map<int, scopeStruct> scopeTable;
 std::unordered_map<std::string, functionStruct> functionTable;
 
@@ -205,6 +167,13 @@ int addParameter(char* name, int type, int scope)
     return isDuplicated;
 }
 
+int getNumParamsOfFunction(int functionScope)
+{
+    functionScope++;
+    std::string functionName = scopeTable[functionScope].functionName;
+    
+    return functionTable[functionName].parametersListMap[functionScope].parameterTypeList.size();
+}
 
 int checkFunctionExists(int functionScope , int returnType)
 {
