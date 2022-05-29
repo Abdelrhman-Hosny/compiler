@@ -3,11 +3,58 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <map>
+
+
+
+struct variableData {
+    int type;
+    int isAssigned;
+    int isConstant;
+
+};
+
+struct scopeStruct
+{
+
+    std::unordered_map<std::string, variableData> variables;
+    int parentScope;
+    std::string functionName = "";
+    int blockType = BLOCK_TYPE_OTHER;
+
+};
+
+struct parameterListStruct {
+    // x( int y )
+    // will cause us to store y : INT_TYPE in the map
+    // key is variable name, value is type
+    std::vector <int> parameterTypeList;
+};
+
+
+struct functionStruct
+{
+    //std::vector<parameterListStruct> parametersList;  
+    //(scope as key to add the right parameters , parametersList as value)
+    std::unordered_map<int,parameterListStruct> parametersListMap;  
+    //std::vector<int> returnTypes;
+    //(scope as key to add the right parameters , returnTypesMap as value)
+    std::unordered_map<int,int> returnTypesMap;
+
+
+};
+
+struct switchTableStruct{
+    int type;
+    std::unordered_set<std::string> caseList;
+};
 
 
 std::unordered_map<int, scopeStruct> scopeTable;
 std::unordered_map<std::string, functionStruct> functionTable;
+//Scope and an unordered set of the switch cases are in the scope
+std::unordered_map<int, switchTableStruct> switchTable;
 
 int getScopeOfVariable(std::string name, int currentScope)
 {
@@ -213,12 +260,13 @@ int checkFunctionExists(int functionScope , int returnType)
     
 }
 
-void createNewScope(int currentScope , int scopeCount)
+void createNewScope(int currentScope , int scopeCount,int blockType)
 {
     int parentScope = currentScope;
     scopeCount++;
     currentScope = scopeCount;
     scopeTable[currentScope].parentScope = parentScope;
+    scopeTable[currentScope].blockType = blockType;
 }
 
 int getParentScope(int currentScope)
@@ -280,10 +328,32 @@ int checkArgumentList(char* name , FunctionCallParameters* ArgumentList)
     return -1;
 }
 
+int getFunctionType(int currentScope)
+{
+    struct scopeStruct currentScopeStruct = scopeTable[currentScope];
+    if (currentScopeStruct.functionName != "")
+    {
+        return functionTable[currentScopeStruct.functionName].returnTypesMap[currentScope];
+    }
+    else
+    {
+        if (currentScopeStruct.parentScope == currentScope)
+            // means that currentScope = global scope and we couldn't find the variable there
+            return -1;
+        else
+            return getFunctionType(currentScopeStruct.parentScope);
+    }
+}
 
 int checkReturn(int scope , int type)
 {
-    int functionType = functionTable[scopeTable[scope].functionName].returnTypesMap[scope];
+    //we will check if the function exists
+    int functionType = getFunctionType(scope);
+    if(functionType == -1)
+    {
+        printf("Error: Function does not exist.\n");
+        return -1;
+    }
     if (functionType != type && !(functionType == FLOAT_TYPE && type == INT_TYPE))
     {
         std::cout << "different return type" << std::endl;
@@ -313,4 +383,90 @@ int checkIsCharFor(ExpressionData* expressionData , int numberLine){
       exit(-1);
     }
     return 1;
+}
+
+int getIDTypeSwitch(char * name, int currentScope)
+{   
+    std::string variableName(name);
+    int scopeOfVariable = getScopeOfVariable(variableName, currentScope);
+    if (scopeOfVariable == -1)
+    {
+        std::cout << "Error: Variable " << variableName << " does not exist in scope " << currentScope << std::endl;
+        return -1;
+    }   
+    if(scopeTable[scopeOfVariable].variables[variableName].isConstant == 0)
+    {
+        std::cout << "Error: Variable " << variableName << " in Switch Case must be constant "<< std::endl;
+        return -1;
+    }
+    return scopeTable[scopeOfVariable].variables[variableName].type;
+
+}
+
+void createNewSwitch(int currentScope,int type){
+    switchTable[currentScope].type = type;
+}
+
+void createNewCase(int currentScope,CaseData* value){
+    //check if the value is of the same type as the switch
+    if(switchTable[currentScope].type != value->type)
+    {
+        std::cout << "Error: Switch Case must be of the same type as the switch" << std::endl;
+    }
+    //check if the value is an ID check if it exists in set or not 
+    if(value->name != nullptr)
+    {
+        std::string variableName(value->name);
+        if(switchTable[currentScope].caseList.find(variableName) != switchTable[currentScope].caseList.end())
+        {
+            std::cout << "Error: Variable " << variableName << " Decalared before in the Switch Case" << std::endl;
+        }
+        else
+        {
+            switchTable[currentScope].caseList.insert(variableName);
+        }
+    }
+    else
+    {
+        //here means I inserted an Integer or character
+        std::string variableName;
+        if(value->type == INT_TYPE)
+        {
+            variableName = std::to_string(value->intValue);
+        }
+        else
+        {
+            variableName = std::string(1,value->charValue);
+        }
+
+        if(switchTable[currentScope].caseList.find(variableName) != switchTable[currentScope].caseList.end())
+        {
+            std::cout << "Error: Variable " << variableName << " Decalared before in the Switch Case" << std::endl;
+        }
+        else
+        {
+            switchTable[currentScope].caseList.insert(variableName);
+        }
+    }
+}
+
+
+int isInSideLoop(int currentScope , std::string name)
+{
+    struct scopeStruct currentScopeStruct = scopeTable[currentScope];
+    if (currentScopeStruct.blockType == BLOCK_TYPE_LOOPS)
+    {
+        return 1;
+    }
+    else
+    {
+        if (currentScopeStruct.parentScope == currentScope)
+            // means that currentScope = global scope and we couldn't find the variable there
+            {
+                std::cout<<name<<" Must be inside a loop"<<std::endl;
+                return -1;
+            }
+        else
+            return isInSideLoop(currentScopeStruct.parentScope,name);
+    }
 }

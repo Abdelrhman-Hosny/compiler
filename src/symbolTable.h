@@ -5,6 +5,7 @@
 
 #ifdef __cplusplus
 #include <vector>
+#include <string>
 extern "C" {
 #endif
 
@@ -67,7 +68,7 @@ extern "C" {
     // void print_table();
     // char get_value_c(char* name, int& flag);
     // char* get_value_s(char* name, int& flag);
-    void createNewScope(int currentScope,int scopeCount);
+    void createNewScope(int currentScope,int scopeCount,int blockType);
     int addParameter(char* name, int type, int scope);
     void createNewFunction(int currentScope,char* name , int returnType);
     int getParentScope(int currentScope);
@@ -77,7 +78,11 @@ extern "C" {
     int checkIsChar(int type , int numberLine);
     int checkIsCharFor(ExpressionData* value , int numberLine);
     int getNumParamsOfFunction(int functionScope);
-    
+    void createNewSwitch(int currentScope,int type);
+    int getIDTypeSwitch(char * name, int scope);
+    void createNewCase(int currentScope,CaseData* value);
+    int getFunctionType(int currentScope);
+    int isInSideLoop(int currentScope,std::string name);
 #ifdef __cplusplus
     }
 #endif

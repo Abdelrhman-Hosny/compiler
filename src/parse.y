@@ -23,6 +23,7 @@ int currentTempCount = 0;
     char* identifierName;
     struct ExpressionData* expressionData;
     struct FunctionCallParameters* functionCallParameters;
+    struct CaseData* caseData;
 }
 
 %start program
@@ -42,13 +43,15 @@ int currentTempCount = 0;
 
 %token <identifierName> ID 
 %token <doubleValue> FLOAT
-%token <intValue> INTEGER
+%token <intValue> INTEGER 
 %token <charValue> CHARACTER
 
 %type <identifierName> assignment for_assignment
 %type <expressionData> math_expr boolean_expr expression function_call optional_expression loop
 %type <stringValue> parameter_list parameter
 %type <functionCallParameters> argument_list
+%type <caseData> case_expression
+%type <intValue> switch_variable
 /*
 by declaring %left '+' before %left '*', this gives precedence to '*'
 the lower you declare something, the higher precedence it has
@@ -492,8 +495,8 @@ boolean_expr : expression '>' expression
                 }
 
 
-block : '{' {createNewScope(currentScope,scopeCount); currentScope = ++scopeCount;} stmt_list '}' {currentScope = getParentScope(currentScope);} |
-        '{' {createNewScope(currentScope,scopeCount); currentScope = ++scopeCount;} '}' {currentScope = getParentScope(currentScope);}
+block : '{' {createNewScope(currentScope,scopeCount,BLOCK_TYPE_OTHER); currentScope = ++scopeCount;} stmt_list '}' {currentScope = getParentScope(currentScope);} |
+        '{' {createNewScope(currentScope,scopeCount,BLOCK_TYPE_OTHER); currentScope = ++scopeCount;} '}' {currentScope = getParentScope(currentScope);}
 
 stmt_list: stmt_list stmt |
             stmt
@@ -503,8 +506,6 @@ stmt : variable_declaration |
         expression ';' |
         loop |
         conditional |
-        BREAK ';' | //TODO: add break and CONTINUE
-        CONTINUE ';' |
         RETURN ';' {int result = checkReturn(currentScope,VOID_TYPE); }|
         RETURN expression ';' 
         {
@@ -514,6 +515,8 @@ stmt : variable_declaration |
 
         }
         |
+        BREAK ';'    { isInSideLoop(currentScope,"Break")}| 
+        CONTINUE ';' { isInSideLoop(currentScope,"Continue")}| 
         block |
         ';'
 
@@ -528,20 +531,19 @@ for_assignment: INT_DECLARATION ID '=' expression {
                                 assignmentQuadruple(assignmentDestination);
                                 if (ret == -1) exit(-1);} | assignment |
 
-//TODO:loops and check expression is in currentScope and defined before
-loop: WHILE {createNewScope(currentScope,scopeCount); currentScope = ++scopeCount;} 
+loop: WHILE {createNewScope(currentScope,scopeCount,BLOCK_TYPE_LOOPS); currentScope = ++scopeCount;} 
         '(' expression ')' {checkIsChar($4->type,yylineno); 
-        createNewScope(currentScope,scopeCount); currentScope = ++scopeCount; createLabel(currentScope);
+        createNewScope(currentScope,scopeCount,BLOCK_TYPE_OTHER); currentScope = ++scopeCount; createLabel(currentScope);
         conditionLabelIfNot(getParentScope(currentScope));} 
         block {
         jumpLabel(currentScope); currentScope = getParentScope(currentScope);
         createLabel(currentScope); currentScope = getParentScope(currentScope);}|
 
-        FOR {createNewScope(currentScope,scopeCount); currentScope = ++scopeCount; createLabel(currentScope);} 
+        FOR {createNewScope(currentScope,scopeCount,BLOCK_TYPE_LOOPS); currentScope = ++scopeCount; createLabel(currentScope);} 
         '(' for_assignment ';' optional_expression ';' for_assignment ')' {checkIsCharFor($6,yylineno);}
         block {exitLabel(currentScope); currentScope = getParentScope(currentScope);}|
 
-        DO {createNewScope(currentScope,scopeCount); currentScope = ++scopeCount; createLabel(currentScope);} 
+        DO {createNewScope(currentScope,scopeCount,BLOCK_TYPE_LOOPS); currentScope = ++scopeCount; createLabel(currentScope);} 
         block WHILE '(' expression ')' ';' {checkIsChar($6->type,yylineno); exitLabel(currentScope); currentScope = getParentScope(currentScope);}
 
  /* Conditional statements */
@@ -550,9 +552,9 @@ conditional: switch_case |
             if_statement
 
 
-if_statement: IF {createNewScope(currentScope,scopeCount); currentScope = ++scopeCount;}  '(' expression  ')' 
+if_statement: IF {createNewScope(currentScope,scopeCount,BLOCK_TYPE_OTHER); currentScope = ++scopeCount;}  '(' expression  ')' 
                  {checkIsChar($4->type,yylineno); 
-                 createNewScope(currentScope,scopeCount); 
+                 createNewScope(currentScope,scopeCount,BLOCK_TYPE_OTHER); 
                  currentScope = ++scopeCount; 
                  conditionLabelIfNot(currentScope);} 
                  stmt 
@@ -569,16 +571,61 @@ end_if: %prec IFX  {
                  currentScope = getParentScope(currentScope);
                  } 
 
-switch_case: SWITCH '(' ID ')' '{'{createNewScope(currentScope,scopeCount);currentScope = ++scopeCount;} case_list '}' {currentScope = getParentScope(currentScope);}
-//TODO: switch case
+
+
+switch_case: SWITCH '(' switch_variable ')' '{'
+            {createNewScope(currentScope,scopeCount,BLOCK_TYPE_SWITCH);
+            currentScope = ++scopeCount; 
+            createNewSwitch(currentScope,$3);} 
+            case_list '}' {currentScope = getParentScope(currentScope);}
+
 case_list:  case_clause case_list|
-            DEFAULT ':' stmt_list|
+            DEFAULT ':' case_stmt_list|
 
 
-case_clause: CASE  expression ':' stmt_list
+switch_variable: ID {
+                    //check if the variable is declared before
+                    int ret = getIDTypeSwitch($1, currentScope);
+                    if(ret != -1) $$ = ret;}| 
+                    INTEGER {$$ = INT_TYPE;} |
+                    CHARACTER {$$ = CHAR_TYPE;} 
+
+case_clause: CASE  case_expression {createNewCase(currentScope,$2);}':' case_stmt_list
 
 
+case_expression: INTEGER {
+                 $$ = new CaseData();
+                 $$->type = INT_TYPE; 
+                 $$->intValue = $1;}| 
+                 CHARACTER {
+                 $$ = new CaseData();
+                 $$->type = CHAR_TYPE; 
+                 $$->charValue = $1;} |
+                 ID  {$$ = new CaseData();
+                 $$->name = $1;
+                 $$->type = getIDTypeSwitch($1, currentScope);}
 
+//for case as they can't have continue or int declaration inside them
+case_stmt_list: case_stmt_list case_stmt |
+            case_stmt
+
+case_stmt : assignment ';'|
+        expression ';' |
+        loop |
+        conditional |
+        BREAK ';' |
+        RETURN ';' {int result = checkReturn(currentScope,VOID_TYPE);}|
+        RETURN expression ';' 
+        {
+                int result = checkReturn(currentScope,$2->type);if (result != -1)
+                returnQuadruple();
+        }
+                |
+        case_block |
+        ';'
+
+case_block : '{' {createNewScope(currentScope,scopeCount,BLOCK_TYPE_OTHER); currentScope = ++scopeCount;} case_stmt_list '}' {currentScope = getParentScope(currentScope);} |
+        '{' {createNewScope(currentScope,scopeCount,BLOCK_TYPE_OTHER); currentScope = ++scopeCount;} '}' {currentScope = getParentScope(currentScope);}
 
 %%
 void yyerror(char *s)
