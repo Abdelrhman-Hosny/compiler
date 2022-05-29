@@ -88,9 +88,31 @@ function_declaration:   INT_DECLARATION ID {createNewFunction(scopeCount,$2,INT_
 parameter_list: parameter|
                 parameter_list ',' parameter|
 
-parameter:  INT_DECLARATION ID  {if(!addParameter($2,INT_TYPE,scopeCount)) exit(-1);}|
-            CHAR_DECLARATION ID {if(!addParameter($2,CHAR_TYPE,scopeCount))  exit(-1);}|
-            FLOAT_DECLARATION ID{if(!addParameter($2,FLOAT_TYPE,scopeCount))  exit(-1);}
+parameter:  INT_DECLARATION ID  
+                {
+                    if(addParameter($2,INT_TYPE,scopeCount)){
+                        std::string variableName($2);
+                        pushToStack(variableName);
+                    }
+                }
+                |
+            CHAR_DECLARATION ID 
+                {
+                    if(addParameter($2,CHAR_TYPE,scopeCount)){
+
+                        std::string variableName($2);
+                        pushToStack(variableName);
+                    }
+                }
+                |
+            FLOAT_DECLARATION ID
+                {
+                    if(addParameter($2,FLOAT_TYPE,scopeCount)){
+
+                        std::string variableName($2);
+                        pushToStack(variableName);
+                    }
+                }
 
 /* Function calls */
 /* type expressionData type isValid = 0*/
@@ -100,7 +122,7 @@ function_call: ID '(' argument_list ')' {
                 // quadruple creation
                 // we don't increase temp count as if the function is void, we won't use it
                 // so we check for that inside the fn
-                currentTempCount = functionQuadruple($1, $3, returnType, currentTempCount);
+                currentTempCount = functionCallQuadruple($1, $3, returnType, currentTempCount);
                 // ExpressionData creation
                 $$ = createExpressionMacro;
                 $$->type = returnType;
