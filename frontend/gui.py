@@ -35,27 +35,27 @@ window = sg.Window("Compiler Text Editor", layout)
 
 while True:  # The Event Loop
     event, values = window.read()
-    print(event, values)
+    # print(event, values)
     if event == sg.WIN_CLOSED or event == "Exit":
         break
 
     elif event == "folder_path":
         folder_path = values["folder_path"]
-        print(folder_path)
+        # print(folder_path)
         try:
             files = os.listdir(folder_path)
         except:
             files = []
 
         files = [f for f in files if f.endswith(".txt") or f.endswith(".py") or f.endswith(".c") or f.endswith(".cpp") or f.endswith(".md")]
-        print(files)
+        # print(files)
         window["file_list"].update(files)
 
     elif event == "file_list":
         file_name = values["file_list"][0]
-        print(file_name)
+        # print(file_name)
         file_path = os.path.join(folder_path, file_name)
-        print(file_path)
+        # print(file_path)
         with open(file_path, "r") as f:
             file_content = f.read()
         window["file_name"].update(file_name)
@@ -71,9 +71,9 @@ while True:  # The Event Loop
 
     elif event == "compile_file" and len(values["file_list"]) > 0:
 
-        print(f"Current working directory : {os.getcwd()}")
+        # print(f"Current working directory : {os.getcwd()}")
         compiler_path = os.path.join(os.getcwd(), "build/a.out")
-        print(f"Compiler path: {compiler_path}")
+        # print(f"Compiler path: {compiler_path}")
         file_name = values["file_list"][0]
         file_path = os.path.join(folder_path, file_name)
         file_content = values["file_content"]
