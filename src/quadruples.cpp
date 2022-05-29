@@ -164,4 +164,3 @@ void functionDeclarationQuadruple(std::string functionName, int functionScope)
     
 }
 //TODO: switch
-//TODO: functions:

@@ -78,7 +78,6 @@ declaration_list: declaration_list declaration |
 declaration: function_declaration |
                 variable_declaration
 
-// TODO : Add func declaration quadruple
  /* Parameter lit for function definition ( parameter_list ) = ( int x, int y)*/
 function_declaration:   INT_DECLARATION ID {createNewFunction(scopeCount,$2,INT_TYPE);} '(' parameter_list ')' 
 {
