@@ -78,6 +78,7 @@ declaration_list: declaration_list declaration |
 declaration: function_declaration |
                 variable_declaration
 
+// TODO : Add func declaration quadruple
  /* Parameter lit for function definition ( parameter_list ) = ( int x, int y)*/
 function_declaration:   INT_DECLARATION ID {createNewFunction(scopeCount,$2,INT_TYPE);} '(' parameter_list ')' {if(!checkFunctionExists(scopeCount,INT_TYPE)) exit(-1);} block  |
                         FLOAT_DECLARATION ID {createNewFunction(scopeCount,$2,FLOAT_TYPE);} '(' parameter_list ')' {if(!checkFunctionExists(scopeCount,FLOAT_TYPE)) exit(-1);} block |
@@ -446,7 +447,7 @@ stmt : variable_declaration |
         conditional |
         BREAK ';' | //TODO: add break and CONTINUE
         CONTINUE ';' |
-        RETURN ';' {int result = checkReturn(currentScope,VOID_TYPE); if(result==-1) exit(-1);}|
+        RETURN ';' {int result = checkReturn(currentScope,VOID_TYPE); if(result==-1) exit(-1);}| // TODO: return quadruple
         RETURN expression ';' {int result = checkReturn(currentScope,$2->type); if(result==-1) exit(-1);} |
         block |
         ';'
