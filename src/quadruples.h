@@ -29,6 +29,7 @@ void conditionLabelIfNot(int labelNumber);
 int functionCallQuadruple(char * functionName, FunctionCallParameters * functionCallParameters, int functionReturnType, int currentTemporaryVariable);
 void returnQuadruple();
 void functionDeclarationQuadruple(std::string functionName, int functionScope);
+void printQuadruplesTableToFile();
 
 #ifdef __cplusplus
     }

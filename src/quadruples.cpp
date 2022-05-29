@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stack>
 #include <vector>
+#include <fstream>
 
 
 std::stack<std::string> expressionStack;
@@ -162,5 +163,21 @@ void functionDeclarationQuadruple(std::string functionName, int functionScope)
 
     }
     
+}
+
+void printQuadruplesTableToFile()
+{
+    std::cout << "Printing quad table" << std::endl;
+
+    // print quadruples table into a file
+    std::ofstream myfile;
+    myfile.open ("quadruples.txt");
+    for (int i = 0; i < quadruplesTable.size(); i++)
+    {
+        printQuadruple(quadruplesTable[i]);
+        myfile << "("  << quadruplesTable[i].destination << ", " << quadruplesTable[i].operand1 << ", " << quadruplesTable[i].operation << ", " << quadruplesTable[i].operand2 << ")" << std::endl;
+    }
+    myfile.close();
+
 }
 //TODO: switch

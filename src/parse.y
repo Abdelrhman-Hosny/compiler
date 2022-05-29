@@ -605,6 +605,7 @@ int main(int argc, char* argv[])
     } while (!feof(yyin));
 
     //printSymbolTable();
+    printQuadruplesTableToFile();
     printQuadrupleTable();
 }
 
