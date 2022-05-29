@@ -80,10 +80,47 @@ declaration: function_declaration |
 
 // TODO : Add func declaration quadruple
  /* Parameter lit for function definition ( parameter_list ) = ( int x, int y)*/
-function_declaration:   INT_DECLARATION ID {createNewFunction(scopeCount,$2,INT_TYPE);} '(' parameter_list ')' {if(!checkFunctionExists(scopeCount,INT_TYPE)) exit(-1);} block  |
-                        FLOAT_DECLARATION ID {createNewFunction(scopeCount,$2,FLOAT_TYPE);} '(' parameter_list ')' {if(!checkFunctionExists(scopeCount,FLOAT_TYPE)) exit(-1);} block |
-                        CHAR_DECLARATION ID {createNewFunction(scopeCount,$2,CHAR_TYPE);} '(' parameter_list ')' {if(!checkFunctionExists(scopeCount,CHAR_TYPE)) exit(-1);} block |
-                        VOID ID {createNewFunction(scopeCount,$2,VOID_TYPE);} '(' parameter_list ')' {if(!checkFunctionExists(scopeCount,VOID_TYPE)) exit(-1);} block
+function_declaration:   INT_DECLARATION ID {createNewFunction(scopeCount,$2,INT_TYPE);} '(' parameter_list ')' 
+{
+    if(checkFunctionExists(scopeCount,INT_TYPE))
+    {
+        std::string functionName($2);
+        functionDeclarationQuadruple(functionName, scopeCount);
+
+    }
+}
+ block  
+ |
+                        FLOAT_DECLARATION ID {createNewFunction(scopeCount,$2,FLOAT_TYPE);} '(' parameter_list ')' 
+{
+    if(!checkFunctionExists(scopeCount,FLOAT_TYPE)){
+        std::string functionName($2);
+        functionDeclarationQuadruple(functionName, scopeCount);
+    }
+
+}
+ block 
+ |
+                        CHAR_DECLARATION ID {createNewFunction(scopeCount,$2,CHAR_TYPE);} '(' parameter_list ')' 
+{
+    if(!checkFunctionExists(scopeCount,CHAR_TYPE)) {
+        std::string functionName($2);
+        functionDeclarationQuadruple(functionName, scopeCount);
+    }
+
+}
+ block 
+ |
+                        VOID ID {createNewFunction(scopeCount,$2,VOID_TYPE);} '(' parameter_list ')' 
+{
+    if(!checkFunctionExists(scopeCount,VOID_TYPE)){
+        std::string functionName($2);
+        functionDeclarationQuadruple(functionName, scopeCount);
+    }
+
+
+}
+ block
 
 parameter_list: parameter|
                 parameter_list ',' parameter|
