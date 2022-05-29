@@ -1,6 +1,7 @@
 #pragma once
 #include "dataStructures.h"
 #include <unordered_map>
+#include <unordered_set>
 #include <string>
 
 #ifdef __cplusplus
@@ -17,14 +18,22 @@ extern "C" {
 
     };
 
+    struct switchTableStruct{
+        int type;
+        std::unordered_set<std::string> caseList;
+    };
+
+
     struct scopeStruct
     {
 
         std::unordered_map<std::string, variableData> variables;
         int parentScope;
         std::string functionName = "";
+        int blockType = BLOCK_TYPE_OTHER;
 
     };
+
 
     struct parameterListStruct {
         // x( int y )

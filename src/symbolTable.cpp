@@ -2,53 +2,8 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <unordered_map>
-#include <unordered_set>
 #include <map>
 
-
-
-struct variableData {
-    int type;
-    int isAssigned;
-    int isConstant;
-
-};
-
-struct scopeStruct
-{
-
-    std::unordered_map<std::string, variableData> variables;
-    int parentScope;
-    std::string functionName = "";
-    int blockType = BLOCK_TYPE_OTHER;
-
-};
-
-struct parameterListStruct {
-    // x( int y )
-    // will cause us to store y : INT_TYPE in the map
-    // key is variable name, value is type
-    std::vector <int> parameterTypeList;
-};
-
-
-struct functionStruct
-{
-    //std::vector<parameterListStruct> parametersList;  
-    //(scope as key to add the right parameters , parametersList as value)
-    std::unordered_map<int,parameterListStruct> parametersListMap;  
-    //std::vector<int> returnTypes;
-    //(scope as key to add the right parameters , returnTypesMap as value)
-    std::unordered_map<int,int> returnTypesMap;
-
-
-};
-
-struct switchTableStruct{
-    int type;
-    std::unordered_set<std::string> caseList;
-};
 
 
 std::unordered_map<int, scopeStruct> scopeTable;

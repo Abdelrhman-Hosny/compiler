@@ -515,8 +515,8 @@ stmt : variable_declaration |
 
         }
         |
-        BREAK ';'    { isInSideLoop(currentScope,"Break")}| 
-        CONTINUE ';' { isInSideLoop(currentScope,"Continue")}| 
+        BREAK ';'    { isInSideLoop(currentScope,"Break");}| 
+        CONTINUE ';' { isInSideLoop(currentScope,"Continue");}| 
         block |
         ';'
 
