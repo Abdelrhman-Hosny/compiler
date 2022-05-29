@@ -175,7 +175,7 @@ void printQuadruplesTableToFile()
     for (int i = 0; i < quadruplesTable.size(); i++)
     {
         printQuadruple(quadruplesTable[i]);
-        myfile << "("  << quadruplesTable[i].destination << ", " << quadruplesTable[i].operand1 << ", " << quadruplesTable[i].operation << ", " << quadruplesTable[i].operand2 << ")" << std::endl;
+        myfile << quadruplesTable[i].destination << "," << quadruplesTable[i].operand1 << "," << quadruplesTable[i].operation << "," << quadruplesTable[i].operand2 << std::endl;
     }
     myfile.close();
 
