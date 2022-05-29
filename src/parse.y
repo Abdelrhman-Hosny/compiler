@@ -266,7 +266,8 @@ math_expr : INTEGER
                 $$->charValue = $1;          
                 $$->valueIsValid = 1;
 
-                std::string operandToPush(std::to_string($1));
+                std::string operandToPush(1, $1);
+                operandToPush = "'" + operandToPush + "'";
                 pushToStack(operandToPush);
             }
             |
