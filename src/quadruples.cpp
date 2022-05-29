@@ -67,7 +67,7 @@ void assignmentQuadruple(std::string destination)
 }
 
 
-int functionQuadruple(char * funcName, FunctionCallParameters * functionCallParameters, int functionReturnType, int currentTemporaryVariable)
+int functionCallQuadruple(char * funcName, FunctionCallParameters * functionCallParameters, int functionReturnType, int currentTemporaryVariable)
 {
     std::string functionName(funcName);
     int argumentsCount = functionCallParameters->parameterTypes.size();
