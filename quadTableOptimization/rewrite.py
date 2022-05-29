@@ -1,4 +1,7 @@
 
+import enum
+
+
 quad_file_path = "../src/quadruples.txt"
 
 with open(quad_file_path, "r") as file:
@@ -13,9 +16,21 @@ operations = {
     "arg": "Function Argument",
 }
 
-splitted_lines = [ line[1:-2].split(',') for line in lines]
+splitted_lines = [ line.split(',') for line in lines]
 
 splitted_lines = [ [line[0].strip(), line[1].strip(), line[2].strip(), line[3].strip()] for line in splitted_lines]
+to_remove = []
+for i in range(len(splitted_lines) - 1):
+    if splitted_lines[i][2] == "goto":
+        if splitted_lines[i] == splitted_lines[i+1]:
+            to_remove.append(i)
+    elif splitted_lines[i][2] == "label":
+        if splitted_lines[i] == splitted_lines[i+1]:
+            to_remove.append(i)
+for index in to_remove:
+    splitted_lines.pop(index)
+
+
 print(splitted_lines)
 # remove repeated labels
 label_indices = []
