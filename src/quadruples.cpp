@@ -180,8 +180,6 @@ void printQuadruplesTableToFile()
     myfile.close();
 
 }
-//TODO:  , break , continue , return single
-
 
 void executeBinaryOperationSwitchCase(std::string operandName, int tempVariablesCount)
 {
@@ -199,4 +197,11 @@ void executeBinaryOperationSwitchCase(std::string operandName, int tempVariables
     pushToStack(destination);
     quadruplesTable.push_back(quadruple);
     
+}
+
+void returnEmptyQuadruple()
+{
+    QuadrupleStruct quadruple = {"", "", "", ""};
+    quadruple.operation = "return";
+    quadruplesTable.push_back(quadruple);
 }

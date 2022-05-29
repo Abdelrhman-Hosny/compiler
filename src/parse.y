@@ -506,7 +506,11 @@ stmt : variable_declaration |
         expression ';' |
         loop |
         conditional |
-        RETURN ';' {int result = checkReturn(currentScope,VOID_TYPE); }|
+        RETURN ';' {
+            int result = checkReturn(currentScope,VOID_TYPE);
+
+            returnEmptyQuadruple();
+         }|
         RETURN expression ';' 
         {
             int result = checkReturn(currentScope,$2->type);
@@ -639,7 +643,10 @@ case_stmt : assignment ';'|
         loop |
         conditional |
         BREAK ';' { jumpLabel(getParentScope(currentScope)); }|
-        RETURN ';' {int result = checkReturn(currentScope,VOID_TYPE);}|
+        RETURN ';' {
+            int result = checkReturn(currentScope,VOID_TYPE);
+            returnEmptyQuadruple(); 
+            }|
         RETURN expression ';' 
         {
                 int result = checkReturn(currentScope,$2->type);if (result != -1)
