@@ -683,8 +683,8 @@ int main(int argc, char* argv[])
         yyparse();
     } while (!feof(yyin));
 
-    //printSymbolTable();
+    printSymbolTable();
     printQuadruplesTableToFile();
-    printQuadrupleTable();
+    //printQuadrupleTable();
 }
 

@@ -26,8 +26,6 @@ std::string popStack()
 
 void executeBinaryOperation(std::string operandName, int tempVariablesCount)
 {
-    std::cout << "Executing binary operation: " << operandName << std::endl;
-    std::cout << "Stack length : " << expressionStack.size() << std::endl;
     std::string operand1 = popStack();
 
     std::string operand2 = popStack();
@@ -43,8 +41,6 @@ void executeBinaryOperation(std::string operandName, int tempVariablesCount)
 
 void executeUnaryOperation(std::string operandName, int tempVariablesCount)
 {
-    std::cout << "Executing unary operation: " << operandName << std::endl;
-    std::cout << "Stack length : " << expressionStack.size() << std::endl;
     std::string operand1 = popStack();
 
     std::string destination = "t" + std::to_string(tempVariablesCount);
@@ -59,8 +55,6 @@ void executeUnaryOperation(std::string operandName, int tempVariablesCount)
 
 void assignmentQuadruple(std::string destination)
 {
-    std::cout << "Executing assignment: " << destination << std::endl;
-    std::cout << "Stack length : " << expressionStack.size() << std::endl;
     std::string operand1 = popStack();
 
     QuadrupleStruct quadruple = {operand1, "", "=", destination};
@@ -183,8 +177,6 @@ void printQuadruplesTableToFile()
 
 void executeBinaryOperationSwitchCase(std::string operandName, int tempVariablesCount)
 {
-    std::cout << "Executing binary operation: " << operandName << std::endl;
-    std::cout << "Stack length : " << expressionStack.size() << std::endl;
     std::string operand1 = popStack();
 
     std::string operand2 = popStack();

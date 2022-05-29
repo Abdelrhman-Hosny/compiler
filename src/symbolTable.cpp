@@ -116,6 +116,8 @@ void printSymbolTable()
     std::cout << "Printing Symbol Table" << std::endl;
     for (auto it = scopeTable.begin(); it != scopeTable.end(); ++it)
     {
+        if(it->second.variables.size() == 0)
+            continue;
         std::cout << "Scope: " << it->first << std::endl;
         for (auto it2 = it->second.variables.begin(); it2 != it->second.variables.end(); ++it2)
         {
