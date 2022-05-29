@@ -1,4 +1,5 @@
 import PySimpleGUI as sg
+import subprocess
 import os
 sg.theme("Dark Blue")  # Keep things interesting for your users
 
@@ -67,4 +68,20 @@ while True:  # The Event Loop
         file_content = values["file_content"]
         with open(file_path, "w") as f:
             f.write(file_content)
+
+    elif event == "compile_file" and len(values["file_list"]) > 0:
+
+        print(f"Current working directory : {os.getcwd()}")
+        compiler_path = os.path.join(os.getcwd(), "build/a.out")
+        print(f"Compiler path: {compiler_path}")
+        file_name = values["file_list"][0]
+        file_path = os.path.join(folder_path, file_name)
+        file_content = values["file_content"]
+        result = subprocess.Popen([compiler_path, file_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        stdout, stderr = result.communicate()
+        print(f"std out {stdout.decode('utf-8')},\n stderr {stderr}")
+
+
+
 window.close()
