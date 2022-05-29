@@ -27,7 +27,7 @@ void exitLabel(int labelNumber);
 void jumpLabel(int labelNumber);
 void conditionLabelIfNot(int labelNumber);
 int functionQuadruple(char * functionName, FunctionCallParameters * functionCallParameters, int functionReturnType, int currentTemporaryVariable);
-
+void returnQuadruple();
 
 #ifdef __cplusplus
     }

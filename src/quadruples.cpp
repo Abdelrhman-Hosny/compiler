@@ -130,6 +130,13 @@ void conditionLabelIfNot(int labelNumber)
     quadruplesTable.push_back(quadruple);
 }
 
-
+void returnQuadruple()
+{
+    std::string expressionStack = popStack();
+    QuadrupleStruct quadruple = {"", "", "", ""};
+    quadruple.operation = "return";
+    quadruple.operand1 = expressionStack;
+    quadruplesTable.push_back(quadruple);
+}
 //TODO: switch
 //TODO: functions:

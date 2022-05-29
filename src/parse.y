@@ -447,8 +447,15 @@ stmt : variable_declaration |
         conditional |
         BREAK ';' | //TODO: add break and CONTINUE
         CONTINUE ';' |
-        RETURN ';' {int result = checkReturn(currentScope,VOID_TYPE); if(result==-1) exit(-1);}| // TODO: return quadruple
-        RETURN expression ';' {int result = checkReturn(currentScope,$2->type); if(result==-1) exit(-1);} |
+        RETURN ';' {int result = checkReturn(currentScope,VOID_TYPE); }| // TODO: return quadruple
+        RETURN expression ';' 
+        {
+            int result = checkReturn(currentScope,$2->type);
+            if (result != -1)
+                returnQuadruple();
+
+        }
+        |
         block |
         ';'
 
