@@ -1,4 +1,5 @@
 #include "quadruples.h"
+#include "symbolTable.h"
 #include <iostream>
 #include <stack>
 #include <vector>
@@ -74,7 +75,9 @@ int functionCallQuadruple(char * funcName, FunctionCallParameters * functionCall
     for (int i = 0; i < argumentsCount; i++)
     {
         std::string parameter = popStack();
-        QuadrupleStruct quadruple = {parameter, "", "param", ""};
+        QuadrupleStruct quadruple = { "", "", "" , ""};
+        quadruple.operation = "arg";
+        quadruple.operand1 = parameter;
         quadruplesTable.push_back(quadruple);
     }
 
@@ -137,6 +140,28 @@ void returnQuadruple()
     quadruple.operation = "return";
     quadruple.operand1 = expressionStack;
     quadruplesTable.push_back(quadruple);
+}
+
+
+void functionDeclarationQuadruple(std::string functionName, int functionScope)
+{
+    int numParameters = getNumParamsOfFunction(functionScope);
+
+    QuadrupleStruct quadruple = {"", "", "", ""};
+    quadruple.operation = "function";
+    quadruple.operand1 = functionName;
+
+    quadruplesTable.push_back(quadruple);
+
+    for (int i = 0; i < numParameters; i++)
+    {
+        QuadrupleStruct quadruple = {"", "", "", ""};
+        quadruple.operation = "param";
+        quadruple.operand1 = popStack();
+        quadruplesTable.push_back(quadruple);
+
+    }
+    
 }
 //TODO: switch
 //TODO: functions:
