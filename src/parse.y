@@ -515,8 +515,8 @@ stmt : variable_declaration |
 
         }
         |
-        BREAK ';'    { isInSideLoop(currentScope,"Break");}| 
-        CONTINUE ';' { isInSideLoop(currentScope,"Continue");}| 
+        BREAK ';'    { isInSideLoop(currentScope,"Break"); jumpLabel(getParentScope(currentScope));}| 
+        CONTINUE ';' { isInSideLoop(currentScope,"Continue"); jumpLabel(getParentScope(currentScope)); }| 
         block |
         ';'
 
@@ -539,8 +539,8 @@ loop: WHILE {createNewScope(currentScope,scopeCount,BLOCK_TYPE_LOOPS); currentSc
         jumpLabel(currentScope); currentScope = getParentScope(currentScope);
         createLabel(currentScope); currentScope = getParentScope(currentScope);}|
 
-        FOR {createNewScope(currentScope,scopeCount,BLOCK_TYPE_LOOPS); currentScope = ++scopeCount; createLabel(currentScope);} 
-        '(' for_assignment ';' optional_expression ';' for_assignment ')' {checkIsCharFor($6,yylineno);}
+        FOR {createNewScope(currentScope,scopeCount,BLOCK_TYPE_LOOPS); currentScope = ++scopeCount;} 
+        '(' for_assignment {createLabel(currentScope);} ';' optional_expression ';' for_assignment ')' {checkIsCharFor($7,yylineno);}
         block {exitLabel(currentScope); currentScope = getParentScope(currentScope);}|
 
         DO {createNewScope(currentScope,scopeCount,BLOCK_TYPE_LOOPS); currentScope = ++scopeCount; createLabel(currentScope);} 
@@ -577,33 +577,58 @@ switch_case: SWITCH '(' switch_variable ')' '{'
             {createNewScope(currentScope,scopeCount,BLOCK_TYPE_SWITCH);
             currentScope = ++scopeCount; 
             createNewSwitch(currentScope,$3);} 
-            case_list '}' {currentScope = getParentScope(currentScope);}
+            case_list '}' {createLabel(currentScope); currentScope = getParentScope(currentScope);}
 
 case_list:  case_clause case_list|
-            DEFAULT ':' case_stmt_list|
+            DEFAULT { createNewScope(currentScope,scopeCount,BLOCK_TYPE_OTHER); 
+                    currentScope = ++scopeCount; } ':' case_stmt_list {currentScope = getParentScope(currentScope);}|
 
 
 switch_variable: ID {
                     //check if the variable is declared before
-                    int ret = getIDTypeSwitch($1, currentScope);
-                    if(ret != -1) $$ = ret;}| 
-                    INTEGER {$$ = INT_TYPE;} |
-                    CHARACTER {$$ = CHAR_TYPE;} 
+                    int ret = getVariableType($1, currentScope);
+                    if(ret != -1) $$ = ret; 
+                    std::string operandToPush(($1));
+                    pushToStack(operandToPush);}| 
+                    INTEGER {
+                    $$ = INT_TYPE; 
+                    std::string operandToPush(std::to_string($1));
+                    pushToStack(operandToPush);} |
+                    CHARACTER {
+                    $$ = CHAR_TYPE;
+                    std::string operandToPush(std::to_string($1));
+                    pushToStack(operandToPush);} 
 
-case_clause: CASE  case_expression {createNewCase(currentScope,$2);}':' case_stmt_list
+case_clause: CASE  case_expression {
+                    createNewCase(currentScope,$2);
+                    executeBinaryOperationSwitchCase("==", currentTempCount);
+                    currentTempCount++;
+                    createNewScope(currentScope,scopeCount,BLOCK_TYPE_OTHER); 
+                    currentScope = ++scopeCount; 
+                    conditionLabelIfNot(currentScope);
+                   }':' case_stmt_list {
+                       createLabel(currentScope);
+                       currentScope = getParentScope(currentScope);}
 
 
 case_expression: INTEGER {
                  $$ = new CaseData();
                  $$->type = INT_TYPE; 
-                 $$->intValue = $1;}| 
+                 $$->intValue = $1;
+                 std::string operandToPush(std::to_string($1));
+                 pushToStack(operandToPush);
+                 }| 
                  CHARACTER {
                  $$ = new CaseData();
                  $$->type = CHAR_TYPE; 
-                 $$->charValue = $1;} |
+                 $$->charValue = $1;
+                 std::string operandToPush(std::to_string($1));
+                 pushToStack(operandToPush);} |
                  ID  {$$ = new CaseData();
                  $$->name = $1;
-                 $$->type = getIDTypeSwitch($1, currentScope);}
+                 $$->type = getIDTypeSwitch($1, currentScope);
+                 std::string operandToPush(($1));
+                 pushToStack(operandToPush);}
 
 //for case as they can't have continue or int declaration inside them
 case_stmt_list: case_stmt_list case_stmt |
@@ -613,7 +638,7 @@ case_stmt : assignment ';'|
         expression ';' |
         loop |
         conditional |
-        BREAK ';' |
+        BREAK ';' { jumpLabel(getParentScope(currentScope)); }|
         RETURN ';' {int result = checkReturn(currentScope,VOID_TYPE);}|
         RETURN expression ';' 
         {

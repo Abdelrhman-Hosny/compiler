@@ -180,4 +180,23 @@ void printQuadruplesTableToFile()
     myfile.close();
 
 }
-//TODO: switch
+//TODO:  , break , continue , return single
+
+
+void executeBinaryOperationSwitchCase(std::string operandName, int tempVariablesCount)
+{
+    std::cout << "Executing binary operation: " << operandName << std::endl;
+    std::cout << "Stack length : " << expressionStack.size() << std::endl;
+    std::string operand1 = popStack();
+
+    std::string operand2 = popStack();
+
+    std::string destination = "t" + std::to_string(tempVariablesCount);
+
+    QuadrupleStruct quadruple = {operand2, operand1, operandName, destination};
+
+    pushToStack(operand2);
+    pushToStack(destination);
+    quadruplesTable.push_back(quadruple);
+    
+}

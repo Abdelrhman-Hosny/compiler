@@ -30,6 +30,7 @@ int functionCallQuadruple(char * functionName, FunctionCallParameters * function
 void returnQuadruple();
 void functionDeclarationQuadruple(std::string functionName, int functionScope);
 void printQuadruplesTableToFile();
+void executeBinaryOperationSwitchCase(std::string operandName, int tempVariablesCount);
 
 #ifdef __cplusplus
     }
