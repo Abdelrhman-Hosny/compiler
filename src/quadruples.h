@@ -5,6 +5,7 @@
 
 #ifdef __cplusplus
 #include <string>
+#include "symbolTable.h"
 extern "C" {
 #endif
 
@@ -21,6 +22,7 @@ void executeBinaryOperation(std::string operation, int tempVariablesCount);
 void printQuadrupleTable();
 void executeUnaryOperation(std::string operation, int tempVariablesCount);
 void assignmentQuadruple(std::string operand);
+int functionQuadruple(char * functionName, FunctionCallParameters * functionCallParameters, int functionReturnType, int currentTemporaryVariable);
 
 
 #ifdef __cplusplus
