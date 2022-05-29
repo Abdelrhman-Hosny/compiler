@@ -28,6 +28,7 @@ void jumpLabel(int labelNumber);
 void conditionLabelIfNot(int labelNumber);
 int functionCallQuadruple(char * functionName, FunctionCallParameters * functionCallParameters, int functionReturnType, int currentTemporaryVariable);
 void returnQuadruple();
+void returnEmptyQuadruple();
 void functionDeclarationQuadruple(std::string functionName, int functionScope);
 void printQuadruplesTableToFile();
 

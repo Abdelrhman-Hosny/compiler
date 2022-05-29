@@ -180,4 +180,11 @@ void printQuadruplesTableToFile()
     myfile.close();
 
 }
+
+void returnEmptyQuadruple()
+{
+    QuadrupleStruct quadruple = {"", "", "", ""};
+    quadruple.operation = "return";
+    quadruplesTable.push_back(quadruple);
+}
 //TODO: switch
